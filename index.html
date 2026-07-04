@@ -8,91 +8,129 @@
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&family=Frank+Ruhl+Libre:wght@700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#141b26; --bg2:#0f151f;
-  --panel:#1b2431; --panel2:#222d3d; --border:#2e3a4c; --border2:#3d4b60;
-  --text:#e8edf4; --muted:#98a6b7; --faint:#6b7a8c;
-  --long:#34d399; --long-dim:rgba(52,211,153,.12);
-  --short:#f4657a; --short-dim:rgba(244,101,122,.12);
-  --amber:#eab661; --amber-dim:rgba(234,182,97,.14);
-  --blue:#64aef0;
-  --radius:12px;
-  --shadow:0 8px 28px rgba(0,0,0,.35);
+  --panel:rgba(26,30,48,.72); --panel2:rgba(34,40,62,.85);
+  --border:#333c58; --border2:#465073;
+  --text:#eaeef7; --muted:#9aa5c0; --faint:#6d7794;
+  --long:#36d69b; --long-dim:rgba(54,214,155,.12);
+  --short:#f4657f; --short-dim:rgba(244,101,127,.12);
+  --amber:#eeb964; --amber-dim:rgba(238,185,100,.14);
+  --violet:#8f7bf5; --blue:#64aef0;
+  --radius:13px;
+  --shadow:0 10px 34px rgba(5,6,20,.45);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:linear-gradient(160deg,var(--bg) 0%,var(--bg2) 100%);color:var(--text);font-family:'Heebo',sans-serif;font-size:15px;min-height:100vh}
+html{scroll-behavior:smooth}
+body{
+  color:var(--text);font-family:'Heebo',sans-serif;font-size:15px;min-height:100vh;
+  background:
+    radial-gradient(1100px 750px at 88% -12%, rgba(143,123,245,.28), transparent 60%),
+    radial-gradient(950px 700px at -12% 108%, rgba(70,140,255,.20), transparent 55%),
+    radial-gradient(700px 500px at 50% 55%, rgba(120,80,220,.10), transparent 65%),
+    linear-gradient(160deg,#1a2036 0%,#161227 55%,#100c1f 100%);
+  background-attachment:fixed;
+}
 .mono{font-family:'IBM Plex Mono',monospace;direction:ltr;unicode-bidi:embed}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;font-size:inherit}
 input,select,textarea{font-family:inherit;font-size:15px;background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:9px 12px;width:100%;outline:none;transition:border-color .15s,box-shadow .15s}
-input:focus,select:focus,textarea:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(234,182,97,.12)}
+input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 0 0 3px rgba(143,123,245,.15)}
 input[type=number]{font-family:'IBM Plex Mono',monospace;direction:ltr;text-align:left}
 label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:5px;font-weight:500}
+label .star{color:var(--short);margin-right:2px}
 ::placeholder{color:var(--faint)}
+input.err,select.err{border-color:var(--short);box-shadow:0 0 0 3px rgba(244,101,127,.13)}
+.ferr{display:none;color:var(--short);font-size:12px;margin-top:4px}
+.ferr.on{display:block}
 
 /* ---------- Candlestick background ---------- */
-#bgChart{position:fixed;inset:0;z-index:0;pointer-events:none}
+#bgChart{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6}
 #bgChart svg{width:100%;height:100%}
-body.logged #bgChart{opacity:.35}
+body.logged #bgChart{opacity:.22}
 #loginScreen,#app{position:relative;z-index:1}
 
 /* ---------- Login ---------- */
 #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.loginCard{background:rgba(24,32,44,.82);backdrop-filter:blur(10px);border:1px solid var(--border2);border-radius:20px;padding:52px 56px;text-align:center;box-shadow:var(--shadow);max-width:440px;width:100%}
+.loginCard{background:rgba(24,26,44,.78);backdrop-filter:blur(14px);border:1px solid var(--border2);border-radius:22px;padding:52px 56px;text-align:center;box-shadow:var(--shadow);max-width:440px;width:100%;position:relative;overflow:hidden}
+.loginCard::before{content:"";position:absolute;inset:-1px;border-radius:22px;padding:1px;background:linear-gradient(135deg,rgba(238,185,100,.5),rgba(143,123,245,.4),transparent 60%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
 .brand{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:44px;line-height:1.25;letter-spacing:.5px}
-.brand em{font-style:normal;color:var(--amber)}
+.brand em{font-style:normal;background:linear-gradient(90deg,var(--amber),#f5d08a);-webkit-background-clip:text;background-clip:text;color:transparent}
 .brand-sub{color:var(--muted);font-size:17px;margin-top:8px;font-weight:400}
 .brand-tag{color:var(--faint);font-size:13px;margin-top:16px;line-height:1.6}
 .gbtn{display:flex;align-items:center;justify-content:center;gap:12px;background:var(--panel2);border:1px solid var(--border2);padding:13px 26px;border-radius:12px;font-size:16px;font-weight:500;transition:all .15s;margin:30px auto 0;width:100%}
-.gbtn:hover{border-color:var(--amber);box-shadow:0 0 0 3px rgba(234,182,97,.12)}
+.gbtn:hover{border-color:var(--amber);box-shadow:0 0 0 3px rgba(238,185,100,.13)}
 
 /* ---------- Shell ---------- */
 #app{display:none;max-width:1200px;margin:0 auto;padding:0 18px 90px}
-header{display:flex;align-items:center;gap:14px;padding:16px 0 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
-header .hbrand{font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:23px}
+header{
+  position:sticky;top:0;z-index:40;
+  display:flex;align-items:center;gap:14px;padding:14px 18px;margin:0 -18px;
+  background:rgba(19,18,38,.82);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  flex-wrap:wrap;
+}
+header .hbrand{font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:23px;cursor:pointer;transition:opacity .15s}
+header .hbrand:hover{opacity:.8}
 header .hbrand em{font-style:normal;color:var(--amber)}
 .spacer{flex:1}
-.seg{display:flex;background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.seg button{padding:7px 15px;color:var(--muted);font-size:13.5px;font-weight:500}
-.seg button.on{background:var(--amber-dim);color:var(--amber)}
-.iconbtn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--panel);transition:border-color .15s}
-.iconbtn:hover{border-color:var(--amber)}
+.seg{display:flex;background:rgba(34,40,62,.6);border:1px solid var(--border);border-radius:11px;overflow:hidden}
+.seg button{padding:8px 18px;color:var(--muted);font-size:13.5px;font-weight:600;transition:all .15s}
+.seg button.onbt{background:rgba(100,174,240,.16);color:var(--blue)}
+.seg button.onlv{background:var(--amber-dim);color:var(--amber)}
+.iconbtn{width:38px;height:38px;border-radius:11px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px;background:rgba(34,40,62,.6);transition:border-color .15s}
+.iconbtn:hover{border-color:var(--violet)}
 #userAv{width:34px;height:34px;border-radius:50%;border:1px solid var(--border2)}
 
-nav.tabs{display:flex;gap:6px;margin:16px 0 20px}
-nav.tabs button{padding:9px 20px;border-radius:10px;color:var(--muted);font-weight:500;border:1px solid transparent;transition:all .15s}
-nav.tabs button.on{background:var(--panel);color:var(--amber);border-color:var(--border2);box-shadow:0 2px 10px rgba(0,0,0,.25)}
-.page{display:none}.page.on{display:block;animation:fadeIn .2s}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+/* env bar */
+#envBar{display:flex;align-items:center;gap:10px;margin:16px 0 0;padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;border:1px solid}
+#envBar.bt{background:rgba(100,174,240,.09);border-color:rgba(100,174,240,.35);color:var(--blue)}
+#envBar.lv{background:rgba(238,185,100,.09);border-color:rgba(238,185,100,.4);color:var(--amber)}
+#envBar small{font-weight:400;color:var(--muted)}
+
+nav.tabs{display:flex;gap:6px;margin:14px 0 20px}
+nav.tabs button{padding:9px 20px;border-radius:11px;color:var(--muted);font-weight:500;border:1px solid transparent;transition:all .15s}
+nav.tabs button.on{background:var(--panel);color:var(--amber);border-color:var(--border2);box-shadow:0 3px 14px rgba(5,6,20,.35);backdrop-filter:blur(6px)}
+.page{display:none}.page.on{display:block;animation:fadeIn .22s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 
 /* ---------- Form ---------- */
-.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.card{background:var(--panel);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
 .formgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .formgrid .c2{grid-column:span 2}.formgrid .c4{grid-column:span 4}
 @media(max-width:820px){.formgrid{grid-template-columns:repeat(2,1fr)}.formgrid .c4{grid-column:span 2}}
 .sect{grid-column:1/-1;display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.14em;color:var(--amber);font-weight:600;margin-top:10px}
-.sect::after{content:"";flex:1;height:1px;background:var(--border)}
-.sect .editlink{letter-spacing:0;font-size:12px;color:var(--muted);border:1px solid var(--border);border-radius:7px;padding:3px 10px}
+.sect::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.sect .editlink{letter-spacing:0;font-size:12px;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:3px 10px;transition:all .15s}
 .sect .editlink:hover{color:var(--amber);border-color:var(--amber)}
-.dirseg{display:flex;border:1px solid var(--border);border-radius:9px;overflow:hidden}
+.dirseg{display:flex;border:1px solid var(--border);border-radius:9px;overflow:hidden;background:var(--panel2)}
 .dirseg button{flex:1;padding:9px;color:var(--muted);font-weight:600;transition:all .15s}
 .dirseg button.long.on{background:var(--long-dim);color:var(--long)}
 .dirseg button.short.on{background:var(--short-dim);color:var(--short)}
 
-#rrWrap{grid-column:1/-1;background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);padding:15px 17px}
+#rrWrap{grid-column:1/-1;background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
 #rrTop{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-#rrVal{font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:600}
+#rrVal{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600}
 #rrVal.bad{color:var(--short)} #rrVal.ok{color:var(--long)}
-#rrBar{display:flex;height:14px;border-radius:7px;overflow:hidden;direction:ltr;background:#0b0f14}
-#rrRisk{background:linear-gradient(90deg,#c94b5e,#f4657a);transition:width .2s}
-#rrReward{background:linear-gradient(90deg,#34d399,#1f9e6c);transition:width .2s}
-#rrInfo{display:flex;gap:22px;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)}
-#rrInfo b{color:var(--text);font-family:'IBM Plex Mono',monospace;font-weight:500}
-#rrWarn{color:var(--short);font-size:13px;margin-top:8px;display:none}
+#rrBar{display:flex;height:14px;border-radius:7px;overflow:hidden;direction:ltr;background:#0b0d18}
+#rrRisk{background:linear-gradient(90deg,#c94b6a,#f4657f);transition:width .25s}
+#rrReward{background:linear-gradient(90deg,#36d69b,#1f9e70);transition:width .25s}
+
+.calcRow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:13px}
+@media(max-width:820px){.calcRow{grid-template-columns:repeat(2,1fr)}}
+.calcbox{background:rgba(15,17,30,.55);border:1px dashed var(--border2);border-radius:10px;padding:9px 12px;user-select:none}
+.calcbox .cl{font-size:11.5px;color:var(--faint)}
+.calcbox .cl::before{content:"🔒 ";font-size:10px}
+.calcbox .cv{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600;margin-top:2px;color:var(--text)}
+.checks{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.ck{font-size:12.5px;padding:4px 12px;border-radius:20px;border:1px solid;font-weight:500}
+.ck.ok{color:var(--long);border-color:rgba(54,214,155,.4);background:rgba(54,214,155,.07)}
+.ck.bad{color:var(--short);border-color:rgba(244,101,127,.4);background:rgba(244,101,127,.07)}
+.ck.idle{color:var(--faint);border-color:var(--border)}
 
 #checklist{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 @media(max-width:820px){#checklist{grid-template-columns:1fr}}
-.chk{display:flex;gap:9px;align-items:flex-start;background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:9px 11px;font-size:13.5px;cursor:pointer;line-height:1.45;transition:border-color .15s}
+.chk{display:flex;gap:9px;align-items:flex-start;background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:9px 11px;font-size:13.5px;cursor:pointer;line-height:1.45;transition:all .15s}
 .chk input{width:auto;margin-top:3px;accent-color:var(--amber)}
-.chk.checked{border-color:rgba(234,182,97,.5);background:rgba(234,182,97,.05)}
+.chk.checked{border-color:rgba(238,185,100,.5);background:rgba(238,185,100,.05)}
+.chk:hover{border-color:var(--border2)}
 
 #pasteZone{border:1.5px dashed var(--border2);border-radius:var(--radius);padding:18px;text-align:center;color:var(--muted);font-size:13.5px;transition:all .15s;background:rgba(255,255,255,.015)}
 #pasteZone.flash{border-color:var(--amber);color:var(--amber)}
@@ -101,12 +139,12 @@ nav.tabs button.on{background:var(--panel);color:var(--amber);border-color:var(-
 .thumb img{height:74px;border-radius:8px;border:1px solid var(--border2);display:block}
 .thumb button{position:absolute;top:-7px;left:-7px;width:21px;height:21px;border-radius:50%;background:var(--short);color:#fff;font-size:12px;line-height:1}
 
-.btn{padding:11px 26px;border-radius:10px;font-weight:600;font-size:15px;transition:all .15s}
-.btn-primary{background:linear-gradient(135deg,#eab661,#d99a3d);color:#1a1206;box-shadow:0 3px 12px rgba(234,182,97,.25)}
-.btn-primary:hover{filter:brightness(1.07)}
+.btn{padding:11px 26px;border-radius:11px;font-weight:600;font-size:15px;transition:all .15s}
+.btn-primary{background:linear-gradient(135deg,#eeb964,#d99a3d);color:#1a1206;box-shadow:0 4px 16px rgba(238,185,100,.28)}
+.btn-primary:hover{filter:brightness(1.07);transform:translateY(-1px)}
 .btn-ghost{border:1px solid var(--border2);color:var(--muted)}
-.btn-ghost:hover{color:var(--text)}
-.formfoot{display:flex;gap:12px;margin-top:20px;align-items:center}
+.btn-ghost:hover{color:var(--text);border-color:var(--violet)}
+.formfoot{display:flex;gap:12px;margin-top:20px;align-items:center;flex-wrap:wrap}
 #saveMsg{color:var(--long);font-size:14px}
 
 /* ---------- Table ---------- */
@@ -116,13 +154,11 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}
 th{color:var(--faint);font-weight:500;font-size:12px;text-align:right;padding:8px 10px;border-bottom:1px solid var(--border)}
 td{padding:10px;border-bottom:1px solid var(--border);vertical-align:middle}
 tbody tr{cursor:pointer;transition:background .1s}
-tbody tr:hover{background:var(--panel2)}
+tbody tr:hover{background:rgba(143,123,245,.06)}
 .tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11.5px;font-weight:600}
-.tag.bt{background:rgba(100,174,240,.13);color:var(--blue)}
-.tag.lv{background:var(--amber-dim);color:var(--amber)}
 .tag.win{background:var(--long-dim);color:var(--long)}
 .tag.loss{background:var(--short-dim);color:var(--short)}
-.tag.be{background:rgba(152,166,183,.15);color:var(--muted)}
+.tag.be{background:rgba(154,165,192,.15);color:var(--muted)}
 .tag.open{background:rgba(100,174,240,.13);color:var(--blue)}
 .dirdot{font-weight:700}
 .dirdot.long{color:var(--long)}.dirdot.short{color:var(--short)}
@@ -131,7 +167,8 @@ tbody tr:hover{background:var(--panel2)}
 /* ---------- Stats ---------- */
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
 @media(max-width:820px){.kpis{grid-template-columns:repeat(2,1fr)}}
-.kpi{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.kpi{background:var(--panel);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi::after{content:"";position:absolute;top:0;right:0;left:0;height:2px;background:linear-gradient(90deg,var(--amber),var(--violet),transparent)}
 .kpi .v{font-family:'IBM Plex Mono',monospace;font-size:27px;font-weight:600;margin-top:4px}
 .kpi .l{font-size:12.5px;color:var(--muted)}
 .pos{color:var(--long)}.neg{color:var(--short)}
@@ -142,9 +179,9 @@ tbody tr:hover{background:var(--panel2)}
 .brk td,.brk th{padding:7px 9px}
 
 /* ---------- Modals ---------- */
-.overlay{display:none;position:fixed;inset:0;background:rgba(6,10,16,.78);z-index:50;align-items:flex-start;justify-content:center;padding:34px 14px;overflow-y:auto;backdrop-filter:blur(3px)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(8,8,20,.78);z-index:50;align-items:flex-start;justify-content:center;padding:34px 14px;overflow-y:auto;backdrop-filter:blur(4px)}
 .overlay.on{display:flex}
-.modal{background:var(--panel);border:1px solid var(--border2);border-radius:16px;padding:24px;width:100%;max-width:640px;box-shadow:var(--shadow)}
+.modal{background:#1c2136;border:1px solid var(--border2);border-radius:16px;padding:24px;width:100%;max-width:640px;box-shadow:var(--shadow)}
 .modal h2{font-size:18px;margin-bottom:16px}
 .modal .close{float:left;color:var(--muted);font-size:20px}
 .dl{display:grid;grid-template-columns:1fr 1fr;gap:9px 20px;font-size:14px}
@@ -152,14 +189,13 @@ tbody tr:hover{background:var(--panel2)}
 #tradeImgs img{width:100%;border-radius:10px;border:1px solid var(--border2);margin-top:10px}
 #tradeImgs .loadimg{margin-top:12px}
 .modal .foot{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
-.btn-danger{border:1px solid rgba(244,101,122,.4);color:var(--short)}
+.btn-danger{border:1px solid rgba(244,101,127,.4);color:var(--short)}
 .settgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .notebox{background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:11px;font-size:13.5px;white-space:pre-wrap;line-height:1.55;margin-top:8px}
-
-/* checklist editor */
 .clrow{display:flex;gap:8px;margin-bottom:8px}
 .clrow input{flex:1}
 .clrow button{width:36px;border:1px solid var(--border);border-radius:8px;color:var(--short);flex-shrink:0}
+#cf_text{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -180,17 +216,18 @@ tbody tr:hover{background:var(--panel2)}
 
 <div id="app">
   <header>
-    <div class="hbrand">יומן <em>מסחר</em></div>
+    <div class="hbrand" id="homeBtn" title="חזרה למסך הבית">יומן <em>מסחר</em></div>
     <div class="spacer"></div>
     <div class="seg" id="modeSeg">
-      <button data-m="all" class="on">הכל</button>
-      <button data-m="backtest">בקטסט</button>
-      <button data-m="live">לייב</button>
+      <button data-m="backtest" class="onbt">🧪 בקטסט</button>
+      <button data-m="live">● לייב</button>
     </div>
     <button class="iconbtn" id="settingsBtn" title="הגדרות">⚙</button>
     <img id="userAv" alt="">
     <button class="iconbtn" id="logoutBtn" title="התנתקות">⎋</button>
   </header>
+
+  <div id="envBar" class="bt"></div>
 
   <nav class="tabs">
     <button data-p="form" class="on">עסקה חדשה</button>
@@ -204,13 +241,6 @@ tbody tr:hover{background:var(--panel2)}
       <div class="formgrid" id="tradeForm">
         <div class="sect">בסיס</div>
         <div>
-          <label>סוג רישום</label>
-          <select id="f_mode">
-            <option value="backtest">בקטסט</option>
-            <option value="live">עסקת לייב</option>
-          </select>
-        </div>
-        <div>
           <label>חשבון</label>
           <select id="f_account">
             <option value="stocks">מניות (קולמקס)</option>
@@ -218,13 +248,15 @@ tbody tr:hover{background:var(--panel2)}
           </select>
         </div>
         <div>
-          <label>סימבול</label>
+          <label><span class="star">*</span>סימבול</label>
           <input id="f_symbol" class="mono" placeholder="AAPL / BTCUSDT" style="text-transform:uppercase">
+          <div class="ferr" id="err_symbol"></div>
         </div>
         <div>
           <label>תאריך העסקה</label>
           <input id="f_date" type="date">
         </div>
+        <div></div>
 
         <div class="sect">הסטאפ</div>
         <div>
@@ -282,10 +314,25 @@ tbody tr:hover{background:var(--panel2)}
         <div class="c4"><div id="checklist"></div></div>
 
         <div class="sect">מחירים וסיכון</div>
-        <div><label>מחיר כניסה</label><input id="f_entry" type="number" step="any" placeholder="0.00"></div>
-        <div><label>מחיר סטופ</label><input id="f_stop" type="number" step="any" placeholder="0.00"></div>
-        <div><label>מחיר טרגט</label><input id="f_target" type="number" step="any" placeholder="0.00"></div>
-        <div><label>סיכון בעסקה (% מהחשבון)</label><input id="f_riskpct" type="number" step="any" placeholder="למשל 1"></div>
+        <div>
+          <label><span class="star">*</span>מחיר כניסה</label>
+          <input id="f_entry" type="number" step="any" placeholder="0.00">
+          <div class="ferr" id="err_entry"></div>
+        </div>
+        <div>
+          <label><span class="star">*</span>מחיר סטופ</label>
+          <input id="f_stop" type="number" step="any" placeholder="0.00">
+          <div class="ferr" id="err_stop"></div>
+        </div>
+        <div>
+          <label><span class="star">*</span>מחיר טרגט</label>
+          <input id="f_target" type="number" step="any" placeholder="0.00">
+          <div class="ferr" id="err_target"></div>
+        </div>
+        <div>
+          <label>סיכון בעסקה (% מהחשבון)</label>
+          <input id="f_riskpct" type="number" step="any" placeholder="אוטומטי מההגדרות">
+        </div>
 
         <div id="rrWrap">
           <div id="rrTop">
@@ -293,8 +340,13 @@ tbody tr:hover{background:var(--panel2)}
             <div id="rrVal" class="mono">—</div>
           </div>
           <div id="rrBar"><div id="rrRisk" style="width:25%"></div><div id="rrReward" style="width:75%"></div></div>
-          <div id="rrInfo"></div>
-          <div id="rrWarn"></div>
+          <div class="calcRow">
+            <div class="calcbox"><div class="cl">סיכון ליחידה</div><div class="cv" id="c_unit">—</div></div>
+            <div class="calcbox"><div class="cl">סיכון כספי</div><div class="cv" id="c_risk">—</div></div>
+            <div class="calcbox"><div class="cl">גודל פוזיציה</div><div class="cv" id="c_size">—</div></div>
+            <div class="calcbox"><div class="cl">עלות פוזיציה</div><div class="cv" id="c_cost">—</div></div>
+          </div>
+          <div class="checks" id="checksRow"></div>
         </div>
 
         <div class="sect">תוצאה וביצוע</div>
@@ -356,11 +408,11 @@ tbody tr:hover{background:var(--panel2)}
     <div class="card" style="padding:6px 14px;overflow-x:auto">
       <table>
         <thead><tr>
-          <th>תאריך</th><th>סוג</th><th>סימבול</th><th>כיוון</th><th>סטאפ</th><th>R:R מתוכנן</th><th>R בפועל</th><th>סטטוס</th><th>ציון</th>
+          <th>תאריך</th><th>סימבול</th><th>כיוון</th><th>סטאפ</th><th>R:R מתוכנן</th><th>R בפועל</th><th>סטטוס</th><th>ציון</th>
         </tr></thead>
         <tbody id="tbody"></tbody>
       </table>
-      <div id="emptyTable">אין עדיין עסקאות — היומן מחכה לרישום הראשון שלך</div>
+      <div id="emptyTable">אין עדיין עסקאות בסביבה הזאת — היומן מחכה לרישום הראשון שלך</div>
     </div>
   </section>
 
@@ -369,7 +421,7 @@ tbody tr:hover{background:var(--panel2)}
     <div class="kpis" id="kpis"></div>
     <div class="breaks" id="breaks"></div>
     <div id="statsEmpty" style="text-align:center;color:var(--faint);padding:40px 0">
-      הסטטיסטיקות ייבנו מעסקאות סגורות (רווח / הפסד / איזון). סגור כמה עסקאות ותתחיל לראות את ה-Edge במספרים.
+      הסטטיסטיקות ייבנו מעסקאות סגורות (רווח / הפסד / איזון) בסביבה הנוכחית. סגור כמה עסקאות ותתחיל לראות את ה-Edge במספרים.
     </div>
   </section>
 </div>
@@ -402,7 +454,7 @@ tbody tr:hover{background:var(--panel2)}
       <div><label>סף אזהרת R:R מינימלי</label><input id="s_minrr" type="number" step="any" placeholder="למשל 2"></div>
     </div>
     <p style="font-size:12.5px;color:var(--muted);margin-top:12px;line-height:1.6">
-      אחוז הסיכון קובע כמה מהחשבון נמחק אם הסטופ נתפס, ומחושב ממנו גודל הפוזיציה. אפשר לשנות אותו פר־עסקה בטופס. סף ה-R:R לא חוסם — רק מדליק אזהרה.
+      אחוז הסיכון קובע כמה מהחשבון נמחק אם הסטופ נתפס, וממנו מחושבים אוטומטית הסיכון הכספי וגודל הפוזיציה. אפשר לשנות אותו פר־עסקה בטופס. סף ה-R:R לא חוסם — רק מדליק אזהרה.
     </p>
     <div class="foot">
       <button class="btn btn-primary" id="s_save">שמור הגדרות</button>
@@ -427,6 +479,18 @@ tbody tr:hover{background:var(--panel2)}
       <button class="btn btn-primary" id="cl_save">שמור צ'קליסט</button>
       <button class="btn btn-ghost" id="cl_reset">שחזר לברירת מחדל</button>
       <span id="cl_msg" style="color:var(--long);align-self:center"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Confirm dialog ============ -->
+<div class="overlay" id="confirmOv" style="z-index:60">
+  <div class="modal" style="max-width:430px;margin-top:16vh">
+    <h2 id="cf_title"></h2>
+    <div id="cf_text"></div>
+    <div class="foot">
+      <button class="btn btn-primary" id="cf_stay"></button>
+      <button class="btn btn-danger" id="cf_leave"></button>
     </div>
   </div>
 </div>
@@ -456,33 +520,30 @@ const db = getDatabase(fb);
   svg.setAttribute("viewBox","0 0 1200 700");
   svg.setAttribute("preserveAspectRatio","xMidYMid slice");
   let seed=7; const rnd=()=>{ seed=(seed*16807)%2147483647; return seed/2147483647; };
-  // accumulation range → markup: a Wyckoff-shaped path
   let price=430, pts=[];
   const N=46, W=1200/N;
   for(let i=0;i<N;i++){
     let drift;
-    if(i<8) drift=-9;                 // decline
-    else if(i<26) drift=(rnd()-0.5)*4; // trading range
-    else if(i===26) drift=-14;         // spring
-    else drift=8;                      // markup
+    if(i<8) drift=-9;
+    else if(i<26) drift=(rnd()-0.5)*4;
+    else if(i===26) drift=-14;
+    else drift=8;
     const o=price, c=price+drift+(rnd()-0.5)*10;
     const hi=Math.max(o,c)+rnd()*14, lo=Math.min(o,c)-rnd()*14;
     pts.push({o,c,hi,lo}); price=c;
   }
   const minP=Math.min(...pts.map(p=>p.lo)), maxP=Math.max(...pts.map(p=>p.hi));
   const y=v=>60+(maxP-v)/(maxP-minP)*560;
-  // soft glow area under trend
   const path=pts.map((p,i)=>`${i?"L":"M"}${i*W+W/2},${y(p.c)}`).join(" ");
   const glow=document.createElementNS(NS,"path");
   glow.setAttribute("d",path);
   glow.setAttribute("fill","none");
-  glow.setAttribute("stroke","rgba(234,182,97,.35)");
+  glow.setAttribute("stroke","rgba(238,185,100,.4)");
   glow.setAttribute("stroke-width","2.5");
-  glow.setAttribute("filter","blur(1px)");
   svg.appendChild(glow);
   pts.forEach((p,i)=>{
     const x=i*W+W/2, up=p.c>=p.o;
-    const col=up?"rgba(52,211,153,.28)":"rgba(244,101,122,.28)";
+    const col=up?"rgba(54,214,155,.3)":"rgba(244,101,127,.3)";
     const wick=document.createElementNS(NS,"line");
     wick.setAttribute("x1",x);wick.setAttribute("x2",x);
     wick.setAttribute("y1",y(p.hi));wick.setAttribute("y2",y(p.lo));
@@ -498,7 +559,7 @@ const db = getDatabase(fb);
   document.getElementById("bgChart").appendChild(svg);
 })();
 
-/* ---------------- Taxonomy (defaults) ---------------- */
+/* ---------------- Taxonomy ---------------- */
 const SETUPS = {
   LPS:   { label:"LPS — Last Point of Support", dir:"long", checklist:[
     "טווח מסחר (TR) עם אקומולציה מאושרת: SC, AR, ST",
@@ -546,13 +607,40 @@ const STATUS_LBL = {open:"פתוחה", win:"רווח", loss:"הפסד", be:"אי
 const ACC_LBL = {stocks:"מניות", crypto:"קריפטו"};
 
 /* ---------------- State ---------------- */
-let uid=null, trades={}, settings={}, viewMode="all";
-let pendingImages=[], editingId=null, currentDetailId=null;
+let uid=null, trades={}, settings={}, viewMode="backtest";
+let pendingImages=[], editingId=null, currentDetailId=null, formDirty=false;
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt = (n,d=2) => (n===null||n===undefined||isNaN(n)) ? "—" : Number(n).toLocaleString("en-US",{maximumFractionDigits:d});
 const effChecklist = key => (settings.checklists && settings.checklists[key]) || SETUPS[key].checklist;
+
+/* ---------------- Confirm dialog ---------------- */
+function askConfirm({title, text, stay, leave}){
+  return new Promise(res=>{
+    $("cf_title").textContent=title;
+    $("cf_text").textContent=text;
+    $("cf_stay").textContent=stay;
+    $("cf_leave").textContent=leave;
+    $("confirmOv").classList.add("on");
+    $("cf_stay").onclick=()=>{ $("confirmOv").classList.remove("on"); res(false); };
+    $("cf_leave").onclick=()=>{ $("confirmOv").classList.remove("on"); res(true); };
+  });
+}
+async function guardNav(){
+  if(!formDirty) return true;
+  const leave = await askConfirm({
+    title:"יש עסקה באמצע מילוי",
+    text:"התחלת למלא נתונים בטופס וטרם שמרת. אם תמשיך, הטופס ינוקה והנתונים יימחקו.",
+    stay:"השאר אותי בטופס",
+    leave:"המשך ומחק את הנתונים"
+  });
+  if(leave){ resetForm(); }
+  return leave;
+}
+window.addEventListener("beforeunload", e=>{
+  if(formDirty){ e.preventDefault(); e.returnValue=""; }
+});
 
 /* ---------------- Auth ---------------- */
 $("loginBtn").onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e=>alert("ההתחברות נכשלה: "+e.message));
@@ -569,7 +657,7 @@ onAuthStateChanged(auth, user=>{
     onValue(ref(db, "settings/"+uid), snap=>{
       settings = snap.val()||{};
       fillSettings();
-      if(!editingId) renderChecklist(getCheckedTexts());
+      if(!formDirty && !editingId) renderChecklist(getCheckedTexts());
       if($("f_riskpct").value==="" && settings.riskPct!=null) $("f_riskpct").value=settings.riskPct;
       calc();
     });
@@ -579,16 +667,42 @@ onAuthStateChanged(auth, user=>{
   }
 });
 
-/* ---------------- Tabs & mode ---------------- */
-document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>{
-  document.querySelectorAll("nav.tabs button").forEach(x=>x.classList.remove("on"));
+/* ---------------- Environment ---------------- */
+function updateEnvUI(){
+  const bt = viewMode==="backtest";
+  $("envBar").className = bt?"bt":"lv";
+  $("envBar").innerHTML = bt
+    ? `🧪 סביבת בקטסט &nbsp;<small>— תרגול על היסטוריה, מופרד לגמרי מהלייב</small>`
+    : `● סביבת לייב &nbsp;<small>— עסקאות בכסף אמיתי</small>`;
+  document.querySelectorAll("#modeSeg button").forEach(b=>{
+    b.className = b.dataset.m===viewMode ? (bt?"onbt":"onlv") : "";
+  });
+  $("saveBtn").textContent = editingId ? "עדכן עסקה" : (bt?"שמור עסקת בקטסט":"שמור עסקת לייב");
+  renderTable(); renderStats();
+}
+document.querySelectorAll("#modeSeg button").forEach(b=>b.onclick=async()=>{
+  if(b.dataset.m===viewMode) return;
+  if(!await guardNav()) return;
+  viewMode=b.dataset.m; updateEnvUI();
+});
+
+/* ---------------- Tabs & home ---------------- */
+async function goTab(p){
+  document.querySelectorAll("nav.tabs button").forEach(x=>x.classList.toggle("on",x.dataset.p===p));
   document.querySelectorAll(".page").forEach(x=>x.classList.remove("on"));
-  b.classList.add("on"); $("page-"+b.dataset.p).classList.add("on");
+  $("page-"+p).classList.add("on");
+}
+document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=async()=>{
+  const leavingForm = document.querySelector('nav.tabs button.on')?.dataset.p==="form" && b.dataset.p!=="form";
+  if(leavingForm && !await guardNav()) return;
+  goTab(b.dataset.p);
 });
-document.querySelectorAll("#modeSeg button").forEach(b=>b.onclick=()=>{
-  document.querySelectorAll("#modeSeg button").forEach(x=>x.classList.remove("on"));
-  b.classList.add("on"); viewMode=b.dataset.m; renderTable(); renderStats();
-});
+$("homeBtn").onclick=async()=>{
+  const onForm = document.querySelector('nav.tabs button.on')?.dataset.p==="form";
+  if(onForm && formDirty){ window.scrollTo({top:0,behavior:"smooth"}); return; }
+  if(!onForm && !await guardNav()) return;
+  goTab("form"); window.scrollTo({top:0,behavior:"smooth"});
+};
 
 /* ---------------- Form ---------------- */
 const setupSel = $("f_setup");
@@ -602,8 +716,8 @@ function setDir(d){ direction=d;
   $("dirShort").classList.toggle("on", d==="short");
   calc();
 }
-$("dirLong").onclick=()=>setDir("long");
-$("dirShort").onclick=()=>setDir("short");
+$("dirLong").onclick=()=>{ setDir("long"); markDirty(); };
+$("dirShort").onclick=()=>{ setDir("short"); markDirty(); };
 
 function getCheckedTexts(){
   return [...document.querySelectorAll("#checklist input:checked")].map(c=>c.dataset.t);
@@ -615,7 +729,7 @@ function renderChecklist(preChecked){
     const on = prev.includes(t);
     return `<label class="chk ${on?'checked':''}"><input type="checkbox" data-t="${esc(t)}" ${on?'checked':''}><span>${esc(t)}</span></label>`;
   }).join("") : `<div style="color:var(--faint);font-size:13px">אין צ'קליסט מוגדר לסטאפ הזה — אפשר להוסיף דרך ✎ עריכת צ'קליסטים</div>`;
-  document.querySelectorAll("#checklist input").forEach(c=>c.onchange=()=>c.closest(".chk").classList.toggle("checked", c.checked));
+  document.querySelectorAll("#checklist input").forEach(c=>c.onchange=()=>{ c.closest(".chk").classList.toggle("checked", c.checked); markDirty(); });
 }
 setupSel.onchange = ()=>{
   renderChecklist();
@@ -625,17 +739,23 @@ setupSel.onchange = ()=>{
 setupSel.value="LPSY"; renderChecklist(); setDir("short");
 $("f_date").valueAsDate = new Date();
 
+function markDirty(){ formDirty=true; }
+["f_symbol","f_entry","f_stop","f_target","f_exit","f_notes","f_riskpct"].forEach(id=>$(id).addEventListener("input", markDirty));
+["f_account","f_phase","f_bias","f_tfC","f_tfT","f_align","f_status","f_grade"].forEach(id=>$(id).addEventListener("change", markDirty));
+
 ["f_entry","f_stop","f_target","f_riskpct"].forEach(id=>$(id).addEventListener("input", calc));
 $("f_account").addEventListener("change", calc);
 
+function chip(ok, textOk, textBad){
+  if(ok===null) return `<span class="ck idle">${textBad}</span>`;
+  return ok ? `<span class="ck ok">✓ ${textOk}</span>` : `<span class="ck bad">✗ ${textBad}</span>`;
+}
 function calc(){
   const e=parseFloat($("f_entry").value), s=parseFloat($("f_stop").value), t=parseFloat($("f_target").value);
-  const rrVal=$("rrVal"), warn=$("rrWarn"), info=$("rrInfo");
-  if(isNaN(e)||isNaN(s)||e===s){ rrVal.textContent="—"; rrVal.className="mono"; info.innerHTML=""; warn.style.display="none";
-    $("rrRisk").style.width="25%"; $("rrReward").style.width="75%"; return; }
-  const risk=Math.abs(e-s);
-  let rr=null;
-  if(!isNaN(t)) rr = Math.abs(t-e)/risk;
+  const rrVal=$("rrVal");
+  const hasES = !isNaN(e)&&!isNaN(s)&&e!==s;
+  const risk = hasES ? Math.abs(e-s) : null;
+  const rr = (hasES && !isNaN(t)) ? Math.abs(t-e)/risk : null;
   const minrr = parseFloat(settings.minRR)||2;
   if(rr!==null){
     rrVal.textContent="1 : "+fmt(rr,2);
@@ -643,27 +763,55 @@ function calc(){
     const total=1+rr;
     $("rrRisk").style.width=(100/total)+"%";
     $("rrReward").style.width=(100*rr/total)+"%";
-    warn.style.display = rr<minrr ? "block":"none";
-    warn.textContent = "⚠ מתחת לסף שהגדרת ("+minrr+") — ודא שיש הצדקה מבנית לעסקה";
-  } else { rrVal.textContent="—"; rrVal.className="mono"; warn.style.display="none"; }
-  let dirWarn="";
-  if(direction==="long" && s>=e) dirWarn="בלונג הסטופ אמור להיות מתחת למחיר הכניסה";
-  if(direction==="short" && s<=e) dirWarn="בשורט הסטופ אמור להיות מעל מחיר הכניסה";
+  } else {
+    rrVal.textContent="—"; rrVal.className="mono";
+    $("rrRisk").style.width="25%"; $("rrReward").style.width="75%";
+  }
   const accSize = parseFloat($("f_account").value==="stocks" ? settings.stocksAccount : settings.cryptoAccount);
   const riskPct = parseFloat($("f_riskpct").value);
-  let sizeHtml="";
-  if(!isNaN(accSize)&&!isNaN(riskPct)&&riskPct>0){
-    const riskAmt = accSize*riskPct/100;
-    let units = riskAmt/risk;
+  let riskAmt=null, units=null, cost=null;
+  if(hasES && !isNaN(accSize) && !isNaN(riskPct) && riskPct>0){
+    riskAmt = accSize*riskPct/100;
+    units = riskAmt/risk;
     if($("f_account").value==="stocks") units=Math.floor(units);
-    sizeHtml = `<div>סיכון כספי: <b>${fmt(riskAmt)}</b></div><div>גודל פוזיציה: <b>${fmt(units, $("f_account").value==="stocks"?0:4)}</b> יח'</div><div>עלות פוזיציה: <b>${fmt(units*e)}</b></div>`;
-  } else if(!isNaN(riskPct)&&riskPct>0){
-    sizeHtml = `<div style="color:var(--faint)">להצגת גודל פוזיציה — הגדר גודל חשבון ב-⚙</div>`;
-  } else {
-    sizeHtml = `<div style="color:var(--faint)">הזן אחוז סיכון (או קבע ברירת מחדל ב-⚙) לחישוב גודל פוזיציה</div>`;
+    cost = units*e;
   }
-  info.innerHTML = `<div>סיכון ליחידה: <b>${fmt(risk,4)}</b></div>` + sizeHtml + (dirWarn?`<div style="color:var(--short)">⚠ ${dirWarn}</div>`:"");
+  $("c_unit").textContent = risk!==null?fmt(risk,4):"—";
+  $("c_risk").textContent = riskAmt!==null?fmt(riskAmt):"—";
+  $("c_size").textContent = units!==null?fmt(units, $("f_account").value==="stocks"?0:4):"—";
+  $("c_cost").textContent = cost!==null?fmt(cost):"—";
+  // validity chips
+  let stopOk=null;
+  if(hasES) stopOk = direction==="long" ? s<e : s>e;
+  let targetOk=null;
+  if(hasES && !isNaN(t)) targetOk = direction==="long" ? t>e : t<e;
+  const chips=[
+    chip(stopOk, "הסטופ בצד הנכון", hasES?"הסטופ בצד הלא נכון לכיוון העסקה":"סטופ — ממתין לנתונים"),
+    chip(targetOk, "הטרגט בכיוון העסקה", (hasES&&!isNaN(t))?"הטרגט בצד הלא נכון":"טרגט — ממתין לנתונים"),
+    chip(rr===null?null:rr>=minrr, "R:R מעל הסף ("+minrr+")", rr===null?"R:R — ממתין לנתונים":"R:R מתחת לסף ("+minrr+")"),
+    chip(isNaN(accSize)?false:(riskAmt!==null?true:null), "גודל חשבון מוגדר", isNaN(accSize)?"גודל חשבון לא הוגדר ב-⚙":"חשבון — ממתין לאחוז סיכון"),
+    chip(cost===null?null:cost<=accSize, "העלות בתוך גודל החשבון", cost===null?"עלות — ממתין לנתונים":"העלות חורגת מגודל החשבון (מינוף?)")
+  ];
+  $("checksRow").innerHTML=chips.join("");
 }
+calc();
+
+/* ---------------- Validation ---------------- */
+function clearErrors(){
+  ["symbol","entry","stop","target"].forEach(k=>{
+    $("f_"+k).classList.remove("err");
+    $("err_"+k).classList.remove("on");
+  });
+}
+function fieldError(k, text){
+  $("f_"+k).classList.add("err");
+  $("err_"+k).textContent=text;
+  $("err_"+k).classList.add("on");
+}
+["f_symbol","f_entry","f_stop","f_target"].forEach(id=>$(id).addEventListener("input",()=>{
+  $(id).classList.remove("err");
+  $(id.replace("f_","err_")).classList.remove("on");
+}));
 
 /* ---------------- Image paste + compression ---------------- */
 window.addEventListener("paste", async ev=>{
@@ -676,6 +824,7 @@ window.addEventListener("paste", async ev=>{
     const dataUrl = await compress(it.getAsFile());
     pendingImages.push(dataUrl);
   }
+  markDirty();
   renderThumbs();
   setTimeout(()=>$("pasteZone").classList.remove("flash"),600);
 });
@@ -705,23 +854,33 @@ function renderThumbs(){
 /* ---------------- Save ---------------- */
 $("saveBtn").onclick = async ()=>{
   if(!uid) return;
+  clearErrors();
   const sym = $("f_symbol").value.trim().toUpperCase();
   const e=parseFloat($("f_entry").value), s=parseFloat($("f_stop").value), t=parseFloat($("f_target").value), x=parseFloat($("f_exit").value);
-  if(!sym){ return msg("חסר סימבול","var(--short)"); }
-  if(isNaN(e)||isNaN(s)){ return msg("חסרים מחירי כניסה/סטופ","var(--short)"); }
+  let bad=false;
+  if(!sym){ fieldError("symbol","חובה להזין סימבול"); bad=true; }
+  if(isNaN(e)){ fieldError("entry","חובה להזין מחיר כניסה"); bad=true; }
+  if(isNaN(s)){ fieldError("stop","חובה להזין מחיר סטופ"); bad=true; }
+  else if(!isNaN(e)&&s===e){ fieldError("stop","הסטופ לא יכול להיות זהה לכניסה"); bad=true; }
+  if(isNaN(t)){ fieldError("target","חובה להזין מחיר טרגט"); bad=true; }
+  if(bad){
+    msg("יש שדות חסרים — מסומנים באדום","var(--short)");
+    document.querySelector("input.err")?.scrollIntoView({behavior:"smooth",block:"center"});
+    return;
+  }
   const risk=Math.abs(e-s);
-  const rr = !isNaN(t)? Math.abs(t-e)/risk : null;
+  const rr = Math.abs(t-e)/risk;
   let actualR=null;
   if(!isNaN(x)) actualR = direction==="long" ? (x-e)/risk : (e-x)/risk;
   const riskPct=parseFloat($("f_riskpct").value);
   const trade={
-    mode:$("f_mode").value, account:$("f_account").value, symbol:sym,
+    mode:viewMode, account:$("f_account").value, symbol:sym,
     date:$("f_date").value||new Date().toISOString().slice(0,10),
     direction, setup:setupSel.value, phase:$("f_phase").value, bias:$("f_bias").value,
     tfContext:$("f_tfC").value, tfTrigger:$("f_tfT").value, align:$("f_align").value,
-    entry:e, stop:s, target:isNaN(t)?null:t, exit:isNaN(x)?null:x,
+    entry:e, stop:s, target:t, exit:isNaN(x)?null:x,
     riskPct:isNaN(riskPct)?null:riskPct,
-    plannedRR: rr===null?null:+rr.toFixed(2),
+    plannedRR:+rr.toFixed(2),
     actualR: actualR===null?null:+actualR.toFixed(2),
     status:$("f_status").value, grade:$("f_grade").value,
     notes:$("f_notes").value.trim(),
@@ -736,8 +895,9 @@ $("saveBtn").onclick = async ()=>{
     else { trade.createdAt=Date.now(); const r=push(ref(db,"trades/"+uid)); id=r.key; await set(r,trade); }
     const imgObj={}; pendingImages.forEach((d,i)=>imgObj["img"+i]=d);
     await set(ref(db,`images/${uid}/${id}`), pendingImages.length?imgObj:null);
-    msg(editingId?"✓ העסקה עודכנה":"✓ העסקה נשמרה ביומן","var(--long)");
+    const wasEdit=!!editingId;
     resetForm(false);
+    msg(wasEdit?"✓ העסקה עודכנה":"✓ העסקה נשמרה ביומן","var(--long)");
   }catch(err){ msg("שגיאה בשמירה: "+err.message,"var(--short)"); }
   $("saveBtn").disabled=false;
 };
@@ -749,17 +909,32 @@ function resetForm(clearMsg=true){
   $("f_riskpct").value = settings.riskPct ?? "";
   $("f_date").valueAsDate=new Date();
   pendingImages=[]; renderThumbs(); renderChecklist();
-  editingId=null; $("saveBtn").textContent="שמור עסקה";
+  editingId=null; formDirty=false;
+  clearErrors();
+  updateEnvLabelOnly();
   if(clearMsg) msg("","");
   calc();
 }
-$("resetBtn").onclick=()=>resetForm();
+function updateEnvLabelOnly(){
+  $("saveBtn").textContent = editingId ? "עדכן עסקה" : (viewMode==="backtest"?"שמור עסקת בקטסט":"שמור עסקת לייב");
+}
+$("resetBtn").onclick=async()=>{
+  if(formDirty){
+    const ok = await askConfirm({
+      title:"לנקות את הטופס?",
+      text:"כל הנתונים שהזנת בטופס יימחקו.",
+      stay:"ביטול", leave:"נקה את הטופס"
+    });
+    if(!ok) return;
+  }
+  resetForm();
+};
 
 /* ---------------- Table ---------------- */
 ["flt_setup","flt_account","flt_status"].forEach(id=>$(id).onchange=renderTable);
 function filtered(){
   return Object.entries(trades).filter(([id,t])=>{
-    if(viewMode!=="all" && t.mode!==viewMode) return false;
+    if(t.mode!==viewMode) return false;
     if($("flt_setup").value && t.setup!==$("flt_setup").value) return false;
     if($("flt_account").value && t.account!==$("flt_account").value) return false;
     if($("flt_status").value && t.status!==$("flt_status").value) return false;
@@ -772,7 +947,6 @@ function renderTable(){
   $("tbody").innerHTML = rows.map(([id,t])=>`
     <tr data-id="${id}">
       <td class="mono" style="font-size:12.5px">${esc(t.date||"")}</td>
-      <td><span class="tag ${t.mode==="live"?"lv":"bt"}">${t.mode==="live"?"לייב":"בקטסט"}</span></td>
       <td class="mono">${esc(t.symbol)}${t.imgCount?` <span title="כולל צילומים">🖼</span>`:""}</td>
       <td><span class="dirdot ${t.direction}">${t.direction==="long"?"▲":"▼"}</span></td>
       <td>${esc((SETUPS[t.setup]?.label||t.setup).split(" —")[0])}</td>
@@ -789,7 +963,7 @@ function openDetail(id){
   currentDetailId=id; const t=trades[id]; if(!t) return;
   $("d_title").innerHTML = `<span class="mono">${esc(t.symbol)}</span> · ${esc((SETUPS[t.setup]?.label||t.setup).split(" —")[0])} <span class="dirdot ${t.direction}">${t.direction==="long"?"▲":"▼"}</span>`;
   const rowsHtml=[
-    ["תאריך",t.date],["סוג",t.mode==="live"?"לייב":"בקטסט"],
+    ["תאריך",t.date],["סביבה",t.mode==="live"?"לייב":"בקטסט"],
     ["חשבון",ACC_LBL[t.account]],["סטטוס",STATUS_LBL[t.status]],
     ["מחיר כניסה",fmt(t.entry,6)],["מחיר סטופ",fmt(t.stop,6)],
     ["מחיר טרגט",t.target?fmt(t.target,6):"—"],["מחיר יציאה",t.exit?fmt(t.exit,6):"—"],
@@ -818,20 +992,27 @@ function openDetail(id){
 }
 $("d_del").onclick=async()=>{
   if(!currentDetailId) return;
-  if(!confirm("למחוק את העסקה לצמיתות? אין דרך חזרה.")) return;
+  const ok = await askConfirm({
+    title:"למחוק את העסקה?",
+    text:"העסקה והצילומים שלה יימחקו לצמיתות. אין דרך חזרה.",
+    stay:"ביטול", leave:"מחק לצמיתות"
+  });
+  if(!ok) return;
   await remove(ref(db,`trades/${uid}/${currentDetailId}`));
   await remove(ref(db,`images/${uid}/${currentDetailId}`));
   $("detailOv").classList.remove("on");
 };
 $("d_edit").onclick=async()=>{
   const t=trades[currentDetailId]; if(!t) return;
+  if(formDirty && !await guardNav()) return;
   editingId=currentDetailId;
-  $("f_mode").value=t.mode; $("f_account").value=t.account; $("f_symbol").value=t.symbol;
+  if(t.mode!==viewMode){ viewMode=t.mode; updateEnvUI(); }
+  $("f_account").value=t.account; $("f_symbol").value=t.symbol;
   $("f_date").value=t.date; setupSel.value=t.setup;
   renderChecklist(t.checkedItems||[]);
   setDir(t.direction);
   $("f_phase").value=t.phase||""; $("f_bias").value=t.bias||"";
-  $("f_tfC").value=t.tfContext||""; $("f_tfT").value=t.tfTrigger||""; $("f_align").value=t.align||"";
+  $("f_tfC").value=t.tfContext||""; $("f_tfT").value=t.tfT||t.tfTrigger||""; $("f_align").value=t.align||"";
   $("f_entry").value=t.entry; $("f_stop").value=t.stop;
   $("f_target").value=t.target??""; $("f_exit").value=t.exit??"";
   $("f_riskpct").value=t.riskPct??(settings.riskPct??"");
@@ -842,9 +1023,10 @@ $("d_edit").onclick=async()=>{
     pendingImages=Object.values(snap.val()||{});
   }
   renderThumbs(); calc();
+  formDirty=false;
   $("saveBtn").textContent="עדכן עסקה";
   $("detailOv").classList.remove("on");
-  document.querySelector('nav.tabs button[data-p="form"]').click();
+  goTab("form");
   window.scrollTo({top:0,behavior:"smooth"});
 };
 
@@ -859,7 +1041,7 @@ function stats(list){
   return { n:closed.length, wins, losses, wr:decided?100*wins/decided:null, avgR:withR.length?sumR/withR.length:null, sumR:withR.length?sumR:null };
 }
 function renderStats(){
-  const list=Object.values(trades).filter(t=>viewMode==="all"||t.mode===viewMode);
+  const list=Object.values(trades).filter(t=>t.mode===viewMode);
   const closed=list.filter(t=>t.status!=="open");
   $("statsEmpty").style.display = closed.length?"none":"block";
   $("kpis").style.display=closed.length?"grid":"none";
@@ -947,13 +1129,21 @@ $("cl_save").onclick=async()=>{
   setTimeout(()=>{$("cl_msg").textContent=""; $("clOv").classList.remove("on");},700);
 };
 $("cl_reset").onclick=async()=>{
-  if(!confirm("לשחזר את הצ'קליסט של הסטאפ הזה לברירת המחדל?")) return;
+  const ok = await askConfirm({
+    title:"לשחזר לברירת מחדל?",
+    text:"הצ'קליסט האישי של הסטאפ הזה יוחלף בגרסה המקורית.",
+    stay:"ביטול", leave:"שחזר"
+  });
+  if(!ok) return;
   await update(ref(db,`settings/${uid}/checklists`), { [clSetupSel.value]: null });
   setTimeout(renderClEditor,300);
 };
 
-/* close overlays on backdrop click */
-document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{ if(e.target===o) o.classList.remove("on"); }));
+/* init env UI */
+updateEnvUI();
+
+/* close overlays on backdrop click (except confirm) */
+["detailOv","settingsOv","clOv"].forEach(id=>$(id).addEventListener("click",e=>{ if(e.target===$(id)) $(id).classList.remove("on"); }));
 </script>
 </body>
 </html>
