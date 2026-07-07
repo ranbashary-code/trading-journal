@@ -249,7 +249,8 @@ tbody tr:hover{background:rgba(143,123,245,.06)}
         </div>
         <div>
           <label><span class="star">*</span>סימבול</label>
-          <input id="f_symbol" class="mono" placeholder="AAPL / BTCUSDT" style="text-transform:uppercase">
+          <select id="f_symbol" class="mono"></select>
+          <input id="f_symbolCustom" class="mono" placeholder="הקלד סימבול..." style="text-transform:uppercase;display:none;margin-top:7px">
           <div class="ferr" id="err_symbol"></div>
         </div>
         <div>
@@ -281,8 +282,8 @@ tbody tr:hover{background:rgba(143,123,245,.06)}
           <label>המבנה בטווח הזמן הגבוה</label>
           <select id="f_bias">
             <option value="">—</option>
-            <option value="acc">אקומולציה (איסוף לפני עלייה)</option>
-            <option value="dist">דיסטריביושן (חלוקה לפני ירידה)</option>
+            <option value="acc">איסוף (לפני עלייה)</option>
+            <option value="dist">פיזור (לפני ירידה)</option>
             <option value="unclear">לא ברור</option>
           </select>
         </div>
@@ -290,14 +291,14 @@ tbody tr:hover{background:rgba(143,123,245,.06)}
           <label>טווח זמן — הקשר</label>
           <select id="f_tfC">
             <option value="">—</option>
-            <option>D</option><option>4H</option><option>1H</option><option>30m</option><option>15m</option><option>5m</option>
+            <option>Month</option><option>Week</option><option>Day</option><option>4H</option><option>1H</option><option>30m</option><option>15m</option><option>5m</option>
           </select>
         </div>
         <div>
           <label>טווח זמן — טריגר</label>
           <select id="f_tfT">
             <option value="">—</option>
-            <option>4H</option><option>1H</option><option>30m</option><option>15m</option><option>5m</option>
+            <option>Day</option><option>4H</option><option>1H</option><option>30m</option><option>15m</option><option>5m</option>
           </select>
         </div>
         <div class="c2">
@@ -325,8 +326,8 @@ tbody tr:hover{background:rgba(143,123,245,.06)}
           <div class="ferr" id="err_stop"></div>
         </div>
         <div>
-          <label><span class="star">*</span>מחיר טרגט</label>
-          <input id="f_target" type="number" step="any" placeholder="0.00">
+          <label>מחיר טרגט <span style="color:var(--faint);font-weight:400">(אופציונלי — ריק אם מנהל בסטופ נגרר)</span></label>
+          <input id="f_target" type="number" step="any" placeholder="השאר ריק אם פתוח">
           <div class="ferr" id="err_target"></div>
         </div>
         <div>
@@ -601,10 +602,29 @@ const SETUPS = {
   OTHER: { label:"אחר", dir:null, checklist:[] }
 };
 const PHASE_LBL = p => p ? "פאזה "+p : "—";
-const BIAS_LBL = {acc:"אקומולציה", dist:"דיסטריביושן", unclear:"לא ברור", "":"—"};
+const BIAS_LBL = {acc:"איסוף", dist:"פיזור", unclear:"לא ברור", "":"—"};
 const ALIGN_LBL = {with:"בכיוון המגמה הגדולה", against:"נגד המגמה הגדולה", unclear:"לא ברור", "":"—"};
 const STATUS_LBL = {open:"פתוחה", win:"רווח", loss:"הפסד", be:"איזון"};
 const ACC_LBL = {stocks:"מניות", crypto:"קריפטו"};
+const CRYPTO_SYMBOLS = ["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT","XRPUSDT","ADAUSDT","DOGEUSDT","AVAXUSDT","LINKUSDT","MATICUSDT","TONUSDT","DOTUSDT"];
+const STOCK_SYMBOLS = ["AAPL","MSFT","AMZN","GOOGL","META","NVDA","TSLA","NFLX","AMD","INTC"];
+function renderSymbolOptions(selected){
+  const acc = $("f_account").value;
+  const list = acc==="crypto" ? CRYPTO_SYMBOLS : STOCK_SYMBOLS;
+  const sel = $("f_symbol");
+  sel.innerHTML = list.map(s=>`<option value="${s}">${s}</option>`).join("") + `<option value="OTHER">אחר (הקלד ידנית)</option>`;
+  if(selected && list.includes(selected)){
+    sel.value = selected; $("f_symbolCustom").style.display="none"; $("f_symbolCustom").value="";
+  } else if(selected){
+    sel.value = "OTHER"; $("f_symbolCustom").style.display="block"; $("f_symbolCustom").value=selected;
+  } else {
+    sel.value = list[0]; $("f_symbolCustom").style.display="none"; $("f_symbolCustom").value="";
+  }
+}
+function resolveSymbol(){
+  const v = $("f_symbol").value;
+  return v==="OTHER" ? $("f_symbolCustom").value.trim().toUpperCase() : v;
+}
 
 /* ---------------- State ---------------- */
 let uid=null, trades={}, settings={}, viewMode="backtest";
@@ -738,10 +758,17 @@ setupSel.onchange = ()=>{
 };
 setupSel.value="LPSY"; renderChecklist(); setDir("short");
 $("f_date").valueAsDate = new Date();
+renderSymbolOptions();
+$("f_account").addEventListener("change", ()=>renderSymbolOptions());
+$("f_symbol").addEventListener("change", ()=>{
+  $("f_symbolCustom").style.display = $("f_symbol").value==="OTHER" ? "block":"none";
+  if($("f_symbol").value==="OTHER") $("f_symbolCustom").focus();
+});
 
 function markDirty(){ formDirty=true; }
-["f_symbol","f_entry","f_stop","f_target","f_exit","f_notes","f_riskpct"].forEach(id=>$(id).addEventListener("input", markDirty));
-["f_account","f_phase","f_bias","f_tfC","f_tfT","f_align","f_status","f_grade"].forEach(id=>$(id).addEventListener("change", markDirty));
+["f_entry","f_stop","f_target","f_exit","f_notes","f_riskpct"].forEach(id=>$(id).addEventListener("input", markDirty));
+["f_account","f_symbol","f_phase","f_bias","f_tfC","f_tfT","f_align","f_status","f_grade"].forEach(id=>$(id).addEventListener("change", markDirty));
+$("f_symbolCustom").addEventListener("input", markDirty);
 
 ["f_entry","f_stop","f_target","f_riskpct"].forEach(id=>$(id).addEventListener("input", calc));
 $("f_account").addEventListener("change", calc);
@@ -787,8 +814,8 @@ function calc(){
   if(hasES && !isNaN(t)) targetOk = direction==="long" ? t>e : t<e;
   const chips=[
     chip(stopOk, "הסטופ בצד הנכון", hasES?"הסטופ בצד הלא נכון לכיוון העסקה":"סטופ — ממתין לנתונים"),
-    chip(targetOk, "הטרגט בכיוון העסקה", (hasES&&!isNaN(t))?"הטרגט בצד הלא נכון":"טרגט — ממתין לנתונים"),
-    chip(rr===null?null:rr>=minrr, "R:R מעל הסף ("+minrr+")", rr===null?"R:R — ממתין לנתונים":"R:R מתחת לסף ("+minrr+")"),
+    chip(targetOk, "הטרגט בכיוון העסקה", (hasES&&!isNaN(t))?"הטרגט בצד הלא נכון":"ללא טרגט קבוע — ניהול בסטופ נגרר"),
+    chip(rr===null?null:rr>=minrr, "R:R מעל הסף ("+minrr+")", rr===null?"R:R — ללא טרגט קבוע":"R:R מתחת לסף ("+minrr+")"),
     chip(isNaN(accSize)?false:(riskAmt!==null?true:null), "גודל חשבון מוגדר", isNaN(accSize)?"גודל חשבון לא הוגדר ב-⚙":"חשבון — ממתין לאחוז סיכון"),
     chip(cost===null?null:cost<=accSize, "העלות בתוך גודל החשבון", cost===null?"עלות — ממתין לנתונים":"העלות חורגת מגודל החשבון (מינוף?)")
   ];
@@ -798,7 +825,7 @@ calc();
 
 /* ---------------- Validation ---------------- */
 function clearErrors(){
-  ["symbol","entry","stop","target"].forEach(k=>{
+  ["symbol","entry","stop"].forEach(k=>{
     $("f_"+k).classList.remove("err");
     $("err_"+k).classList.remove("on");
   });
@@ -808,10 +835,12 @@ function fieldError(k, text){
   $("err_"+k).textContent=text;
   $("err_"+k).classList.add("on");
 }
-["f_symbol","f_entry","f_stop","f_target"].forEach(id=>$(id).addEventListener("input",()=>{
+["f_entry","f_stop"].forEach(id=>$(id).addEventListener("input",()=>{
   $(id).classList.remove("err");
   $(id.replace("f_","err_")).classList.remove("on");
 }));
+$("f_symbol").addEventListener("change", ()=>{ $("f_symbol").classList.remove("err"); $("err_symbol").classList.remove("on"); });
+$("f_symbolCustom").addEventListener("input", ()=>{ $("f_symbol").classList.remove("err"); $("err_symbol").classList.remove("on"); });
 
 /* ---------------- Image paste + compression ---------------- */
 window.addEventListener("paste", async ev=>{
@@ -855,21 +884,20 @@ function renderThumbs(){
 $("saveBtn").onclick = async ()=>{
   if(!uid) return;
   clearErrors();
-  const sym = $("f_symbol").value.trim().toUpperCase();
+  const sym = resolveSymbol();
   const e=parseFloat($("f_entry").value), s=parseFloat($("f_stop").value), t=parseFloat($("f_target").value), x=parseFloat($("f_exit").value);
   let bad=false;
-  if(!sym){ fieldError("symbol","חובה להזין סימבול"); bad=true; }
+  if(!sym){ fieldError("symbol","חובה לבחור או להזין סימבול"); bad=true; }
   if(isNaN(e)){ fieldError("entry","חובה להזין מחיר כניסה"); bad=true; }
   if(isNaN(s)){ fieldError("stop","חובה להזין מחיר סטופ"); bad=true; }
   else if(!isNaN(e)&&s===e){ fieldError("stop","הסטופ לא יכול להיות זהה לכניסה"); bad=true; }
-  if(isNaN(t)){ fieldError("target","חובה להזין מחיר טרגט"); bad=true; }
   if(bad){
     msg("יש שדות חסרים — מסומנים באדום","var(--short)");
-    document.querySelector("input.err")?.scrollIntoView({behavior:"smooth",block:"center"});
+    document.querySelector("input.err, select.err")?.scrollIntoView({behavior:"smooth",block:"center"});
     return;
   }
   const risk=Math.abs(e-s);
-  const rr = Math.abs(t-e)/risk;
+  const rr = !isNaN(t) ? Math.abs(t-e)/risk : null;
   let actualR=null;
   if(!isNaN(x)) actualR = direction==="long" ? (x-e)/risk : (e-x)/risk;
   const riskPct=parseFloat($("f_riskpct").value);
@@ -878,9 +906,9 @@ $("saveBtn").onclick = async ()=>{
     date:$("f_date").value||new Date().toISOString().slice(0,10),
     direction, setup:setupSel.value, phase:$("f_phase").value, bias:$("f_bias").value,
     tfContext:$("f_tfC").value, tfTrigger:$("f_tfT").value, align:$("f_align").value,
-    entry:e, stop:s, target:t, exit:isNaN(x)?null:x,
+    entry:e, stop:s, target:isNaN(t)?null:t, exit:isNaN(x)?null:x,
     riskPct:isNaN(riskPct)?null:riskPct,
-    plannedRR:+rr.toFixed(2),
+    plannedRR: rr===null?null:+rr.toFixed(2),
     actualR: actualR===null?null:+actualR.toFixed(2),
     status:$("f_status").value, grade:$("f_grade").value,
     notes:$("f_notes").value.trim(),
@@ -903,11 +931,12 @@ $("saveBtn").onclick = async ()=>{
 };
 function msg(t,c){ $("saveMsg").textContent=t; $("saveMsg").style.color=c; }
 function resetForm(clearMsg=true){
-  ["f_symbol","f_entry","f_stop","f_target","f_exit","f_notes"].forEach(id=>$(id).value="");
+  ["f_entry","f_stop","f_target","f_exit","f_notes"].forEach(id=>$(id).value="");
   $("f_status").value="open"; $("f_grade").value=""; $("f_phase").value=""; $("f_bias").value="";
   $("f_tfC").value=""; $("f_tfT").value=""; $("f_align").value="";
   $("f_riskpct").value = settings.riskPct ?? "";
   $("f_date").valueAsDate=new Date();
+  renderSymbolOptions();
   pendingImages=[]; renderThumbs(); renderChecklist();
   editingId=null; formDirty=false;
   clearErrors();
@@ -1007,7 +1036,7 @@ $("d_edit").onclick=async()=>{
   if(formDirty && !await guardNav()) return;
   editingId=currentDetailId;
   if(t.mode!==viewMode){ viewMode=t.mode; updateEnvUI(); }
-  $("f_account").value=t.account; $("f_symbol").value=t.symbol;
+  $("f_account").value=t.account; renderSymbolOptions(t.symbol);
   $("f_date").value=t.date; setupSel.value=t.setup;
   renderChecklist(t.checkedItems||[]);
   setDir(t.direction);
