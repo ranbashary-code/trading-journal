@@ -449,12 +449,25 @@ tbody tr:hover{background:rgba(143,123,245,.06)}
 
     <div class="card" style="margin-bottom:16px">
       <h3 style="color:var(--amber);font-size:14px;letter-spacing:.08em;margin-bottom:14px">חשבון וסיכון</h3>
+      <div style="margin-bottom:16px">
+        <div style="color:var(--blue);font-size:12.5px;font-weight:600;margin-bottom:8px">🧪 סביבת בקטסט — הון היפותטי לסימולציה (לא כסף אמיתי)</div>
+        <div class="settgrid">
+          <div><label>הון מדומה — מניות ($)</label><input id="s_stocksBT" type="number" step="any" placeholder="לדוגמה 10000"></div>
+          <div><label>הון מדומה — קריפטו (USDT)</label><input id="s_cryptoBT" type="number" step="any" placeholder="לדוגמה 10000"></div>
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="color:var(--amber);font-size:12.5px;font-weight:600;margin-bottom:8px">● סביבת לייב — חשבון אמיתי</div>
+        <div class="settgrid">
+          <div><label>גודל חשבון מניות ($)</label><input id="s_stocks" type="number" step="any" placeholder="לא הוגדר"></div>
+          <div><label>גודל חשבון קריפטו (USDT)</label><input id="s_crypto" type="number" step="any" placeholder="לא הוגדר"></div>
+        </div>
+      </div>
       <div class="settgrid">
-        <div><label>גודל חשבון מניות ($)</label><input id="s_stocks" type="number" step="any" placeholder="לא הוגדר"></div>
-        <div><label>גודל חשבון קריפטו (USDT)</label><input id="s_crypto" type="number" step="any" placeholder="לא הוגדר"></div>
         <div><label>סיכון ברירת מחדל לעסקה (%)</label><input id="s_risk" type="number" step="any" placeholder="למשל 1"></div>
         <div><label>סף אזהרת R:R מינימלי</label><input id="s_minrr" type="number" step="any" placeholder="למשל 2"></div>
       </div>
+      <p style="font-size:12px;color:var(--faint);margin-top:10px">אחוז הסיכון וסף ה-R:R משותפים לשתי הסביבות — אלה כללי המסחר שלך, לא תלוי סביבה. גודל החשבון כן נפרד, כדי שבקטסט לא יתערבב עם כסף אמיתי.</p>
       <div class="foot"><button class="btn btn-primary" id="s_save">שמור הגדרות</button><span id="s_msg" style="color:var(--long);align-self:center"></span></div>
     </div>
 
@@ -727,6 +740,10 @@ function effTF(kind){
   if(kind==="context") return (t.context && t.context.length) ? t.context : TF_CONTEXT_DEFAULT;
   return (t.trigger && t.trigger.length) ? t.trigger : TF_TRIGGER_DEFAULT;
 }
+function effAccountSize(account){
+  if(viewMode==="backtest") return account==="stocks" ? settings.stocksAccountBT : settings.cryptoAccountBT;
+  return account==="stocks" ? settings.stocksAccount : settings.cryptoAccount;
+}
 function renderSymbolOptions(selected){
   const acc = $("f_account").value;
   const list = effSymbols(acc);
@@ -828,7 +845,7 @@ function updateEnvUI(){
     b.className = b.dataset.m===viewMode ? (bt?"onbt":"onlv") : "";
   });
   $("saveBtn").textContent = editingId ? "עדכן עסקה" : (bt?"שמור עסקת בקטסט":"שמור עסקת לייב");
-  renderTable(); renderStats();
+  renderTable(); renderStats(); calc();
 }
 document.querySelectorAll("#modeSeg button").forEach(b=>b.onclick=async()=>{
   if(b.dataset.m===viewMode) return;
@@ -938,7 +955,7 @@ function calc(){
     rrVal.textContent="—"; rrVal.className="mono";
     $("rrRisk").style.width="25%"; $("rrReward").style.width="75%";
   }
-  const accSize = parseFloat($("f_account").value==="stocks" ? settings.stocksAccount : settings.cryptoAccount);
+  const accSize = parseFloat(effAccountSize($("f_account").value));
   const riskPct = parseFloat($("f_riskpct").value);
   let riskAmt=null, units=null, cost=null;
   if(hasES && !isNaN(accSize) && !isNaN(riskPct) && riskPct>0){
@@ -960,7 +977,7 @@ function calc(){
     chip(stopOk, "הסטופ בצד הנכון", hasES?"הסטופ בצד הלא נכון לכיוון העסקה":"סטופ — ממתין לנתונים"),
     chip(targetOk, "הטרגט בכיוון העסקה", (hasES&&!isNaN(t))?"הטרגט בצד הלא נכון":"ללא טרגט קבוע — ניהול בסטופ נגרר"),
     chip(rr===null?null:rr>=minrr, "R:R מעל הסף ("+minrr+")", rr===null?"R:R — ללא טרגט קבוע":"R:R מתחת לסף ("+minrr+")"),
-    chip(isNaN(accSize)?false:(riskAmt!==null?true:null), "גודל חשבון מוגדר", isNaN(accSize)?"גודל חשבון לא הוגדר ב-⚙":"חשבון — ממתין לאחוז סיכון"),
+    chip(isNaN(accSize)?false:(riskAmt!==null?true:null), "גודל חשבון מוגדר", isNaN(accSize)?(viewMode==="backtest"?"לא הוגדר הון בקטסט ב-⚙":"לא הוגדר חשבון לייב ב-⚙"):"חשבון — ממתין לאחוז סיכון"),
     chip(cost===null?null:cost<=accSize, "העלות בתוך גודל החשבון", cost===null?"עלות — ממתין לנתונים":"העלות חורגת מגודל החשבון (מינוף?)")
   ];
   $("checksRow").innerHTML=chips.join("");
@@ -1055,7 +1072,7 @@ $("saveBtn").onclick = async ()=>{
   let actualR=null;
   if(!isNaN(x)) actualR = direction==="long" ? (x-e)/risk : (e-x)/risk;
   const riskPct=parseFloat($("f_riskpct").value);
-  const accSize = parseFloat($("f_account").value==="stocks" ? settings.stocksAccount : settings.cryptoAccount);
+  const accSize = parseFloat(effAccountSize($("f_account").value));
   let positionSize=null, pnlAmount=null;
   if(!isNaN(accSize) && !isNaN(riskPct) && riskPct>0){
     const riskAmt = accSize*riskPct/100;
@@ -1295,6 +1312,8 @@ $("settingsBtn").onclick=async()=>{
 function fillSettings(){
   $("s_stocks").value=settings.stocksAccount??"";
   $("s_crypto").value=settings.cryptoAccount??"";
+  $("s_stocksBT").value=settings.stocksAccountBT??"";
+  $("s_cryptoBT").value=settings.cryptoAccountBT??"";
   $("s_risk").value=settings.riskPct??"";
   $("s_minrr").value=settings.minRR??"";
 }
@@ -1302,6 +1321,7 @@ $("s_save").onclick=async()=>{
   const v=id=>{ const x=parseFloat($(id).value); return isNaN(x)?null:x; };
   await update(ref(db,"settings/"+uid), {
     stocksAccount:v("s_stocks"), cryptoAccount:v("s_crypto"),
+    stocksAccountBT:v("s_stocksBT"), cryptoAccountBT:v("s_cryptoBT"),
     riskPct:v("s_risk"), minRR:v("s_minrr")
   });
   $("s_msg").textContent="✓ נשמר";
