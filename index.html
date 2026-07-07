@@ -222,7 +222,7 @@ tbody tr:hover{background:rgba(143,123,245,.06)}
       <button data-m="backtest" class="onbt">🧪 בקטסט</button>
       <button data-m="live">● לייב</button>
     </div>
-    <button class="iconbtn" id="settingsBtn" title="הגדרות">⚙</button>
+    <button class="iconbtn" id="settingsBtn" title="ניהול המערכת">⚙</button>
     <img id="userAv" alt="">
     <button class="iconbtn" id="logoutBtn" title="התנתקות">⎋</button>
   </header>
@@ -233,6 +233,7 @@ tbody tr:hover{background:rgba(143,123,245,.06)}
     <button data-p="form" class="on">עסקה חדשה</button>
     <button data-p="journal">היומן</button>
     <button data-p="stats">סטטיסטיקות</button>
+    <button data-p="admin">⚙ ניהול</button>
   </nav>
 
   <!-- ============ FORM ============ -->
@@ -429,6 +430,103 @@ tbody tr:hover{background:rgba(143,123,245,.06)}
       הסטטיסטיקות ייבנו מעסקאות סגורות (רווח / הפסד / איזון) בסביבה הנוכחית. סגור כמה עסקאות ותתחיל לראות את ה-Edge במספרים.
     </div>
   </section>
+
+  <!-- ============ ADMIN ============ -->
+  <section class="page" id="page-admin">
+
+    <div class="card" style="margin-bottom:16px">
+      <h3 style="color:var(--amber);font-size:14px;letter-spacing:.08em;margin-bottom:14px">חשבון וסיכון</h3>
+      <div class="settgrid">
+        <div><label>גודל חשבון מניות ($)</label><input id="s_stocks" type="number" step="any" placeholder="לא הוגדר"></div>
+        <div><label>גודל חשבון קריפטו (USDT)</label><input id="s_crypto" type="number" step="any" placeholder="לא הוגדר"></div>
+        <div><label>סיכון ברירת מחדל לעסקה (%)</label><input id="s_risk" type="number" step="any" placeholder="למשל 1"></div>
+        <div><label>סף אזהרת R:R מינימלי</label><input id="s_minrr" type="number" step="any" placeholder="למשל 2"></div>
+      </div>
+      <div class="foot"><button class="btn btn-primary" id="s_save">שמור הגדרות</button><span id="s_msg" style="color:var(--long);align-self:center"></span></div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <h3 style="color:var(--amber);font-size:14px;letter-spacing:.08em;margin-bottom:14px">ניהול סטאפים</h3>
+      <div id="adm_setups"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <input id="adm_newSetupName" placeholder="שם הסטאפ החדש..." style="flex:2;min-width:160px">
+        <select id="adm_newSetupDir" style="flex:1;min-width:110px">
+          <option value="">בלי כיוון קבוע</option>
+          <option value="long">לונג</option>
+          <option value="short">שורט</option>
+        </select>
+        <button class="btn btn-primary" id="adm_addSetup">+ הוסף סטאפ</button>
+      </div>
+      <div id="adm_setupMsg" style="color:var(--long);font-size:13.5px;margin-top:8px"></div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <h3 style="color:var(--amber);font-size:14px;letter-spacing:.08em;margin-bottom:14px">רשימות סימבולים</h3>
+      <div class="settgrid">
+        <div>
+          <label>קריפטו</label>
+          <div id="adm_symCrypto"></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input id="adm_addCrypto" placeholder="BTCUSDT..." class="mono" style="text-transform:uppercase">
+            <button class="btn btn-ghost" id="adm_addCryptoBtn">+</button>
+          </div>
+          <button class="btn btn-ghost" id="adm_resetCrypto" style="margin-top:8px;font-size:12.5px">שחזר לברירת מחדל</button>
+        </div>
+        <div>
+          <label>מניות</label>
+          <div id="adm_symStocks"></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input id="adm_addStock" placeholder="AAPL..." class="mono" style="text-transform:uppercase">
+            <button class="btn btn-ghost" id="adm_addStockBtn">+</button>
+          </div>
+          <button class="btn btn-ghost" id="adm_resetStocks" style="margin-top:8px;font-size:12.5px">שחזר לברירת מחדל</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <h3 style="color:var(--amber);font-size:14px;letter-spacing:.08em;margin-bottom:14px">טווחי זמן</h3>
+      <div class="settgrid">
+        <div>
+          <label>הקשר (טווח זמן גבוה)</label>
+          <div id="adm_tfContext"></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input id="adm_addTfC" placeholder="2H..." class="mono">
+            <button class="btn btn-ghost" id="adm_addTfCBtn">+</button>
+          </div>
+          <button class="btn btn-ghost" id="adm_resetTfC" style="margin-top:8px;font-size:12.5px">שחזר לברירת מחדל</button>
+        </div>
+        <div>
+          <label>טריגר (טווח זמן כניסה)</label>
+          <div id="adm_tfTrigger"></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input id="adm_addTfT" placeholder="2H..." class="mono">
+            <button class="btn btn-ghost" id="adm_addTfTBtn">+</button>
+          </div>
+          <button class="btn btn-ghost" id="adm_resetTfT" style="margin-top:8px;font-size:12.5px">שחזר לברירת מחדל</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <h3 style="color:var(--amber);font-size:14px;letter-spacing:.08em;margin-bottom:14px">נתונים</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+        <span id="adm_counts">—</span>
+      </p>
+      <div class="foot">
+        <button class="btn btn-ghost" id="adm_export">⬇ ייצוא כל היומן (JSON)</button>
+      </div>
+      <p style="font-size:12px;color:var(--faint);margin-top:8px">הייצוא כולל את כל העסקאות וההגדרות, ללא צילומי הגרפים (לצמצום גודל הקובץ).</p>
+    </div>
+
+    <div class="card" style="border-color:rgba(244,101,127,.35)">
+      <h3 style="color:var(--short);font-size:14px;letter-spacing:.08em;margin-bottom:14px">אזור סכנה</h3>
+      <div class="foot">
+        <button class="btn btn-danger" id="adm_wipeBT">מחק את כל עסקאות הבקטסט</button>
+        <button class="btn btn-danger" id="adm_wipeLV">מחק את כל עסקאות הלייב</button>
+      </div>
+    </div>
+  </section>
 </div>
 
 <!-- ============ Trade detail ============ -->
@@ -447,27 +545,7 @@ tbody tr:hover{background:rgba(143,123,245,.06)}
   </div>
 </div>
 
-<!-- ============ Settings ============ -->
-<div class="overlay" id="settingsOv">
-  <div class="modal" style="max-width:540px">
-    <button class="close" onclick="document.getElementById('settingsOv').classList.remove('on')">✕</button>
-    <h2>הגדרות חשבון וסיכון</h2>
-    <div class="settgrid">
-      <div><label>גודל חשבון מניות ($)</label><input id="s_stocks" type="number" step="any" placeholder="לא הוגדר"></div>
-      <div><label>גודל חשבון קריפטו (USDT)</label><input id="s_crypto" type="number" step="any" placeholder="לא הוגדר"></div>
-      <div><label>סיכון ברירת מחדל לעסקה (%)</label><input id="s_risk" type="number" step="any" placeholder="למשל 1"></div>
-      <div><label>סף אזהרת R:R מינימלי</label><input id="s_minrr" type="number" step="any" placeholder="למשל 2"></div>
-    </div>
-    <p style="font-size:12.5px;color:var(--muted);margin-top:12px;line-height:1.6">
-      אחוז הסיכון קובע כמה מהחשבון נמחק אם הסטופ נתפס, וממנו מחושבים אוטומטית הסיכון הכספי וגודל הפוזיציה. אפשר לשנות אותו פר־עסקה בטופס. סף ה-R:R לא חוסם — רק מדליק אזהרה.
-    </p>
-    <div class="foot">
-      <button class="btn btn-primary" id="s_save">שמור הגדרות</button>
-      <button class="btn btn-ghost" id="s_openCl">✎ עריכת צ'קליסטים</button>
-      <span id="s_msg" style="color:var(--long);align-self:center"></span>
-    </div>
-  </div>
-</div>
+<!-- (הגדרות עברו לטאב ⚙ ניהול) -->
 
 <!-- ============ Checklist editor ============ -->
 <div class="overlay" id="clOv">
@@ -612,9 +690,32 @@ const STATUS_LBL = {open:"פתוחה", win:"רווח", loss:"הפסד", be:"אי
 const ACC_LBL = {stocks:"מניות", crypto:"קריפטו"};
 const CRYPTO_SYMBOLS = ["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT","XRPUSDT","ADAUSDT","DOGEUSDT","AVAXUSDT","LINKUSDT","MATICUSDT","TONUSDT","DOTUSDT"];
 const STOCK_SYMBOLS = ["AAPL","MSFT","AMZN","GOOGL","META","NVDA","TSLA","NFLX","AMD","INTC"];
+const TF_CONTEXT_DEFAULT = ["Month","Week","Day","4H","1H","30m","15m","5m"];
+const TF_TRIGGER_DEFAULT = ["Day","4H","1H","30m","15m","5m"];
+
+/* merged setup taxonomy: built-in + user-defined custom setups */
+function customSetups(){ return settings.customSetups || {}; }
+function getSetupDef(key){
+  return customSetups()[key] || SETUPS[key] || {label:key, dir:null, checklist:[]};
+}
+function setupEntries(){
+  const builtin = ["LPS","LPSY","SPRING","UTAD"].map(k=>[k,SETUPS[k]]);
+  const custom = Object.entries(customSetups());
+  return [...builtin, ...custom, ["OTHER",SETUPS.OTHER]];
+}
+function effSymbols(acc){
+  const s = settings.symbols || {};
+  if(acc==="crypto") return (s.crypto && s.crypto.length) ? s.crypto : CRYPTO_SYMBOLS;
+  return (s.stocks && s.stocks.length) ? s.stocks : STOCK_SYMBOLS;
+}
+function effTF(kind){
+  const t = settings.timeframes || {};
+  if(kind==="context") return (t.context && t.context.length) ? t.context : TF_CONTEXT_DEFAULT;
+  return (t.trigger && t.trigger.length) ? t.trigger : TF_TRIGGER_DEFAULT;
+}
 function renderSymbolOptions(selected){
   const acc = $("f_account").value;
-  const list = acc==="crypto" ? CRYPTO_SYMBOLS : STOCK_SYMBOLS;
+  const list = effSymbols(acc);
   const sel = $("f_symbol");
   sel.innerHTML = list.map(s=>`<option value="${s}">${s}</option>`).join("") + `<option value="OTHER">אחר (הקלד ידנית)</option>`;
   if(selected && list.includes(selected)){
@@ -629,6 +730,11 @@ function resolveSymbol(){
   const v = $("f_symbol").value;
   return v==="OTHER" ? $("f_symbolCustom").value.trim().toUpperCase() : v;
 }
+function renderTimeframeSelect(id, kind, keepVal){
+  const el=$(id); const cur = keepVal!==undefined ? keepVal : el.value;
+  el.innerHTML = `<option value="">—</option>` + effTF(kind).map(t=>`<option>${esc(t)}</option>`).join("");
+  if(cur && effTF(kind).includes(cur)) el.value=cur;
+}
 
 /* ---------------- State ---------------- */
 let uid=null, trades={}, settings={}, viewMode="backtest";
@@ -637,7 +743,7 @@ let pendingImages=[], editingId=null, currentDetailId=null, formDirty=false;
 const $ = id => document.getElementById(id);
 const esc = s => String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt = (n,d=2) => (n===null||n===undefined||isNaN(n)) ? "—" : Number(n).toLocaleString("en-US",{maximumFractionDigits:d});
-const effChecklist = key => (settings.checklists && settings.checklists[key]) || SETUPS[key].checklist;
+const effChecklist = key => (settings.checklists && settings.checklists[key]) || getSetupDef(key).checklist || [];
 
 /* ---------------- Confirm dialog ---------------- */
 function askConfirm({title, text, stay, leave}){
@@ -677,10 +783,16 @@ onAuthStateChanged(auth, user=>{
     $("userAv").src = user.photoURL || "";
     $("loginScreen").style.display="none";
     $("app").style.display="block";
-    onValue(ref(db, "trades/"+uid), snap=>{ trades = snap.val()||{}; renderTable(); renderStats(); });
+    onValue(ref(db, "trades/"+uid), snap=>{ trades = snap.val()||{}; renderTable(); renderStats(); renderAdminCounts(); });
     onValue(ref(db, "settings/"+uid), snap=>{
       settings = snap.val()||{};
       fillSettings();
+      populateSetupSelects();
+      populateClSetupSelect();
+      renderSymbolOptions(resolveSymbol());
+      renderTimeframeSelect("f_tfC","context",$("f_tfC").value);
+      renderTimeframeSelect("f_tfT","trigger",$("f_tfT").value);
+      renderAdminSetups(); renderAdminSymbols(); renderAdminTimeframes();
       if(!formDirty && !editingId) renderChecklist(getCheckedTexts());
       if($("f_riskpct").value==="" && settings.riskPct!=null) $("f_riskpct").value=settings.riskPct;
       calc();
@@ -730,10 +842,17 @@ $("homeBtn").onclick=async()=>{
 
 /* ---------------- Form ---------------- */
 const setupSel = $("f_setup");
-Object.entries(SETUPS).forEach(([k,v])=>{
-  setupSel.insertAdjacentHTML("beforeend", `<option value="${k}">${esc(v.label)}</option>`);
-  if(k!=="OTHER") $("flt_setup").insertAdjacentHTML("beforeend", `<option value="${k}">${esc(v.label.split(" —")[0])}</option>`);
-});
+function populateSetupSelects(){
+  const cur=setupSel.value;
+  setupSel.innerHTML="";
+  $("flt_setup").innerHTML=`<option value="">כל הסטאפים</option>`;
+  setupEntries().forEach(([k,v])=>{
+    setupSel.insertAdjacentHTML("beforeend", `<option value="${k}">${esc(v.label)}</option>`);
+    if(k!=="OTHER") $("flt_setup").insertAdjacentHTML("beforeend", `<option value="${k}">${esc(v.label.split(" —")[0])}</option>`);
+  });
+  if(cur) setupSel.value=cur;
+}
+populateSetupSelects();
 let direction="long";
 function setDir(d){ direction=d;
   $("dirLong").classList.toggle("on", d==="long");
@@ -757,12 +876,14 @@ function renderChecklist(preChecked){
 }
 setupSel.onchange = ()=>{
   renderChecklist();
-  const d = SETUPS[setupSel.value].dir;
+  const d = getSetupDef(setupSel.value).dir;
   if(d) setDir(d);
 };
 setupSel.value="LPSY"; renderChecklist(); setDir("short");
 $("f_date").valueAsDate = new Date();
 renderSymbolOptions();
+renderTimeframeSelect("f_tfC","context");
+renderTimeframeSelect("f_tfT","trigger");
 $("f_account").addEventListener("change", ()=>renderSymbolOptions());
 $("f_symbol").addEventListener("change", ()=>{
   $("f_symbolCustom").style.display = $("f_symbol").value==="OTHER" ? "block":"none";
@@ -992,7 +1113,7 @@ function renderTable(){
       <td class="mono" style="font-size:12.5px">${esc(t.date||"")}</td>
       <td class="mono">${esc(t.symbol)}${t.imgCount?` <span title="כולל צילומים">🖼</span>`:""}</td>
       <td><span class="dirdot ${t.direction}">${t.direction==="long"?"▲":"▼"}</span></td>
-      <td>${esc((SETUPS[t.setup]?.label||t.setup).split(" —")[0])}</td>
+      <td>${esc((getSetupDef(t.setup).label||t.setup).split(" —")[0])}</td>
       <td class="mono">${t.plannedRR?("1:"+fmt(t.plannedRR)):"—"}</td>
       <td class="mono ${t.actualR>0?"pos":t.actualR<0?"neg":""}">${t.actualR===null||t.actualR===undefined?"—":fmt(t.actualR)+"R"}</td>
       <td><span class="tag ${t.status}">${STATUS_LBL[t.status]||""}</span></td>
@@ -1004,7 +1125,7 @@ function renderTable(){
 /* ---------------- Detail ---------------- */
 function openDetail(id){
   currentDetailId=id; const t=trades[id]; if(!t) return;
-  $("d_title").innerHTML = `<span class="mono">${esc(t.symbol)}</span> · ${esc((SETUPS[t.setup]?.label||t.setup).split(" —")[0])} <span class="dirdot ${t.direction}">${t.direction==="long"?"▲":"▼"}</span>`;
+  $("d_title").innerHTML = `<span class="mono">${esc(t.symbol)}</span> · ${esc((getSetupDef(t.setup).label||t.setup).split(" —")[0])} <span class="dirdot ${t.direction}">${t.direction==="long"?"▲":"▼"}</span>`;
   const rowsHtml=[
     ["תאריך",t.date],["סביבה",t.mode==="live"?"לייב":"בקטסט"],
     ["חשבון",ACC_LBL[t.account]],["סטטוס",STATUS_LBL[t.status]],
@@ -1097,7 +1218,7 @@ function renderStats(){
     <div class="kpi"><div class="l">R ממוצע לעסקה (תוחלת)</div><div class="v ${s.avgR>0?"pos":s.avgR<0?"neg":""}">${s.avgR===null?"—":fmt(s.avgR,2)+"R"}</div></div>
     <div class="kpi"><div class="l">R מצטבר</div><div class="v ${s.sumR>0?"pos":s.sumR<0?"neg":""}">${s.sumR===null?"—":fmt(s.sumR,1)+"R"}</div></div>`;
   const groups=[
-    ["לפי סטאפ", t=>(SETUPS[t.setup]?.label||t.setup).split(" —")[0]],
+    ["לפי סטאפ", t=>(getSetupDef(t.setup).label||t.setup).split(" —")[0]],
     ["לפי חשבון", t=>ACC_LBL[t.account]||t.account],
     ["לפי תנועה ביחס למגמה", t=>ALIGN_LBL[t.align||""]],
     ["לפי ציון ביצוע", t=>t.grade||"ללא ציון"],
@@ -1121,8 +1242,12 @@ function renderStats(){
   }).join("");
 }
 
-/* ---------------- Settings ---------------- */
-$("settingsBtn").onclick=()=>$("settingsOv").classList.add("on");
+/* ---------------- Settings (מוזג לטאב ⚙ ניהול) ---------------- */
+$("settingsBtn").onclick=async()=>{
+  const onForm = document.querySelector('nav.tabs button.on')?.dataset.p==="form";
+  if(onForm && formDirty && !await guardNav()) return;
+  goTab("admin");
+};
 function fillSettings(){
   $("s_stocks").value=settings.stocksAccount??"";
   $("s_crypto").value=settings.cryptoAccount??"";
@@ -1136,19 +1261,171 @@ $("s_save").onclick=async()=>{
     riskPct:v("s_risk"), minRR:v("s_minrr")
   });
   $("s_msg").textContent="✓ נשמר";
-  setTimeout(()=>{$("s_msg").textContent="";$("settingsOv").classList.remove("on");},700);
+  setTimeout(()=>{$("s_msg").textContent="";},1200);
+};
+
+/* ---------------- Admin: Setups ---------------- */
+function renderAdminSetups(){
+  const rows = setupEntries().filter(([k])=>k!=="OTHER").map(([k,v])=>{
+    const isCustom = !!customSetups()[k];
+    const dirLbl = v.dir==="long"?"לונג":v.dir==="short"?"שורט":"—";
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--panel2);border:1px solid var(--border);border-radius:9px;margin-bottom:8px;flex-wrap:wrap">
+      <b style="flex:1;min-width:140px">${esc(v.label)}</b>
+      <span style="color:var(--muted);font-size:12.5px">${dirLbl}</span>
+      <span style="color:var(--faint);font-size:12px">${effChecklist(k).length} סעיפי צ'קליסט</span>
+      <button class="btn btn-ghost" style="padding:6px 14px;font-size:12.5px" data-edit="${k}">✎ ערוך צ'קליסט</button>
+      ${isCustom?`<button class="btn btn-danger" style="padding:6px 14px;font-size:12.5px" data-del="${k}">מחק</button>`:""}
+    </div>`;
+  }).join("");
+  $("adm_setups").innerHTML = rows || `<div style="color:var(--faint);font-size:13px">אין סטאפים</div>`;
+  $("adm_setups").querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{
+    clSetupSel.value=b.dataset.edit; renderClEditor(); $("clOv").classList.add("on");
+  });
+  $("adm_setups").querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{
+    const key=b.dataset.del;
+    const ok = await askConfirm({
+      title:"למחוק את הסטאפ?",
+      text:`"${getSetupDef(key).label}" יימחק מרשימת הסטאפים. עסקאות קיימות שנרשמו תחתיו לא יימחקו, אך יוצגו לפי המזהה הגולמי.`,
+      stay:"ביטול", leave:"מחק סטאפ"
+    });
+    if(!ok) return;
+    await update(ref(db,`settings/${uid}/customSetups`), { [key]: null });
+  });
+}
+$("adm_addSetup").onclick=async()=>{
+  const name=$("adm_newSetupName").value.trim();
+  if(!name){ $("adm_setupMsg").style.color="var(--short)"; $("adm_setupMsg").textContent="חובה להזין שם לסטאפ"; return; }
+  const dir=$("adm_newSetupDir").value||null;
+  const key="CUSTOM_"+Date.now();
+  await update(ref(db,`settings/${uid}/customSetups`), { [key]: {label:name, dir, checklist:[]} });
+  $("adm_newSetupName").value=""; $("adm_newSetupDir").value="";
+  $("adm_setupMsg").style.color="var(--long)"; $("adm_setupMsg").textContent="✓ נוסף — אפשר לערוך את הצ'קליסט שלו למטה";
+  setTimeout(()=>$("adm_setupMsg").textContent="",2500);
+};
+
+/* ---------------- Admin: Symbols ---------------- */
+function symRow(list, s, kind){
+  return `<span style="display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--border);border-radius:20px;padding:4px 6px 4px 12px;margin:3px;font-size:13px" class="mono">${esc(s)}<button data-del="${esc(s)}" data-kind="${kind}" style="width:18px;height:18px;border-radius:50%;background:var(--short);color:#fff;font-size:11px;line-height:1">✕</button></span>`;
+}
+function renderAdminSymbols(){
+  const c=effSymbols("crypto"), s=effSymbols("stocks");
+  $("adm_symCrypto").innerHTML = c.map(x=>symRow(c,x,"crypto")).join("");
+  $("adm_symStocks").innerHTML = s.map(x=>symRow(s,x,"stocks")).join("");
+  document.querySelectorAll("#adm_symCrypto [data-del], #adm_symStocks [data-del]").forEach(b=>b.onclick=async()=>{
+    const kind=b.dataset.kind, val=b.dataset.del;
+    const cur=effSymbols(kind).filter(x=>x!==val);
+    await update(ref(db,`settings/${uid}/symbols`), { [kind]: cur });
+  });
+}
+async function addSymbol(kind, inputId){
+  const val=$(inputId).value.trim().toUpperCase();
+  if(!val) return;
+  const cur=effSymbols(kind);
+  if(cur.includes(val)){ $(inputId).value=""; return; }
+  await update(ref(db,`settings/${uid}/symbols`), { [kind]: [...cur, val] });
+  $(inputId).value="";
+}
+$("adm_addCryptoBtn").onclick=()=>addSymbol("crypto","adm_addCrypto");
+$("adm_addStockBtn").onclick=()=>addSymbol("stocks","adm_addStock");
+$("adm_addCrypto").addEventListener("keydown",e=>{ if(e.key==="Enter") addSymbol("crypto","adm_addCrypto"); });
+$("adm_addStock").addEventListener("keydown",e=>{ if(e.key==="Enter") addSymbol("stocks","adm_addStock"); });
+$("adm_resetCrypto").onclick=async()=>{
+  const ok=await askConfirm({title:"לשחזר את רשימת הקריפטו?",text:"הרשימה תחזור לברירת המחדל של המערכת.",stay:"ביטול",leave:"שחזר"});
+  if(!ok) return;
+  await update(ref(db,`settings/${uid}/symbols`), { crypto:null });
+};
+$("adm_resetStocks").onclick=async()=>{
+  const ok=await askConfirm({title:"לשחזר את רשימת המניות?",text:"הרשימה תחזור לברירת המחדל של המערכת.",stay:"ביטול",leave:"שחזר"});
+  if(!ok) return;
+  await update(ref(db,`settings/${uid}/symbols`), { stocks:null });
+};
+
+/* ---------------- Admin: Timeframes ---------------- */
+function tfRow(val, kind){
+  return `<span style="display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--border);border-radius:20px;padding:4px 6px 4px 12px;margin:3px;font-size:13px" class="mono">${esc(val)}<button data-del="${esc(val)}" data-kind="${kind}" style="width:18px;height:18px;border-radius:50%;background:var(--short);color:#fff;font-size:11px;line-height:1">✕</button></span>`;
+}
+function renderAdminTimeframes(){
+  const c=effTF("context"), t=effTF("trigger");
+  $("adm_tfContext").innerHTML = c.map(x=>tfRow(x,"context")).join("");
+  $("adm_tfTrigger").innerHTML = t.map(x=>tfRow(x,"trigger")).join("");
+  document.querySelectorAll("#adm_tfContext [data-del], #adm_tfTrigger [data-del]").forEach(b=>b.onclick=async()=>{
+    const kind=b.dataset.kind, val=b.dataset.del;
+    const cur=effTF(kind).filter(x=>x!==val);
+    await update(ref(db,`settings/${uid}/timeframes`), { [kind]: cur });
+  });
+}
+async function addTF(kind, inputId){
+  const val=$(inputId).value.trim();
+  if(!val) return;
+  const cur=effTF(kind);
+  if(cur.includes(val)){ $(inputId).value=""; return; }
+  await update(ref(db,`settings/${uid}/timeframes`), { [kind]: [...cur, val] });
+  $(inputId).value="";
+}
+$("adm_addTfCBtn").onclick=()=>addTF("context","adm_addTfC");
+$("adm_addTfTBtn").onclick=()=>addTF("trigger","adm_addTfT");
+$("adm_addTfC").addEventListener("keydown",e=>{ if(e.key==="Enter") addTF("context","adm_addTfC"); });
+$("adm_addTfT").addEventListener("keydown",e=>{ if(e.key==="Enter") addTF("trigger","adm_addTfT"); });
+$("adm_resetTfC").onclick=async()=>{
+  const ok=await askConfirm({title:"לשחזר את טווחי ההקשר?",text:"הרשימה תחזור לברירת המחדל של המערכת.",stay:"ביטול",leave:"שחזר"});
+  if(!ok) return;
+  await update(ref(db,`settings/${uid}/timeframes`), { context:null });
+};
+$("adm_resetTfT").onclick=async()=>{
+  const ok=await askConfirm({title:"לשחזר את טווחי הטריגר?",text:"הרשימה תחזור לברירת המחדל של המערכת.",stay:"ביטול",leave:"שחזר"});
+  if(!ok) return;
+  await update(ref(db,`settings/${uid}/timeframes`), { trigger:null });
+};
+
+/* ---------------- Admin: Data & danger zone ---------------- */
+function renderAdminCounts(){
+  const all=Object.values(trades);
+  const bt=all.filter(t=>t.mode==="backtest").length;
+  const lv=all.filter(t=>t.mode==="live").length;
+  $("adm_counts").textContent = `${bt} עסקאות בקטסט · ${lv} עסקאות לייב · ${all.length} סה"כ`;
+}
+$("adm_export").onclick=()=>{
+  const payload = { exportedAt:new Date().toISOString(), settings, trades };
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download="trading-journal-export-"+new Date().toISOString().slice(0,10)+".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+};
+async function wipeMode(mode){
+  const ids = Object.entries(trades).filter(([,t])=>t.mode===mode).map(([id])=>id);
+  if(!ids.length) return;
+  await Promise.all(ids.flatMap(id=>[remove(ref(db,`trades/${uid}/${id}`)), remove(ref(db,`images/${uid}/${id}`))]));
+}
+$("adm_wipeBT").onclick=async()=>{
+  const n=Object.values(trades).filter(t=>t.mode==="backtest").length;
+  const ok=await askConfirm({title:"למחוק את כל עסקאות הבקטסט?",text:`${n} עסקאות בקטסט (וצילומיהן) יימחקו לצמיתות. אין דרך חזרה.`,stay:"ביטול",leave:"מחק הכל"});
+  if(!ok) return;
+  await wipeMode("backtest");
+};
+$("adm_wipeLV").onclick=async()=>{
+  const n=Object.values(trades).filter(t=>t.mode==="live").length;
+  const ok=await askConfirm({title:"למחוק את כל עסקאות הלייב?",text:`${n} עסקאות לייב (וצילומיהן) יימחקו לצמיתות. אין דרך חזרה.`,stay:"ביטול",leave:"מחק הכל"});
+  if(!ok) return;
+  await wipeMode("live");
 };
 
 /* ---------------- Checklist editor ---------------- */
 const clSetupSel=$("cl_setup");
-Object.entries(SETUPS).forEach(([k,v])=>clSetupSel.insertAdjacentHTML("beforeend",`<option value="${k}">${esc(v.label)}</option>`));
+function populateClSetupSelect(){
+  const cur=clSetupSel.value;
+  clSetupSel.innerHTML="";
+  setupEntries().forEach(([k,v])=>clSetupSel.insertAdjacentHTML("beforeend",`<option value="${k}">${esc(v.label)}</option>`));
+  if(cur) clSetupSel.value=cur;
+}
+populateClSetupSelect();
 function openClEditor(){
   clSetupSel.value=setupSel.value;
   renderClEditor();
   $("clOv").classList.add("on");
 }
 $("editChecklistBtn").onclick=openClEditor;
-$("s_openCl").onclick=()=>{ $("settingsOv").classList.remove("on"); openClEditor(); };
 clSetupSel.onchange=renderClEditor;
 function renderClEditor(){
   const items=effChecklist(clSetupSel.value);
@@ -1184,9 +1461,10 @@ $("cl_reset").onclick=async()=>{
 
 /* init env UI */
 updateEnvUI();
+renderAdminCounts();
 
 /* close overlays on backdrop click (except confirm) */
-["detailOv","settingsOv","clOv"].forEach(id=>$(id).addEventListener("click",e=>{ if(e.target===$(id)) $(id).classList.remove("on"); }));
+["detailOv","clOv"].forEach(id=>$(id).addEventListener("click",e=>{ if(e.target===$(id)) $(id).classList.remove("on"); }));
 </script>
 </body>
 </html>
