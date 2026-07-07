@@ -778,6 +778,7 @@ let pendingImages=[], editingId=null, currentDetailId=null, formDirty=false;
 const $ = id => document.getElementById(id);
 const esc = s => String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt = (n,d=2) => (n===null||n===undefined||isNaN(n)) ? "—" : Number(n).toLocaleString("en-US",{maximumFractionDigits:d});
+const fmtDate = iso => { if(!iso) return "—"; const p=iso.split("-"); return p.length===3 ? `${p[2]}-${p[1]}-${p[0]}` : iso; };
 const effChecklist = key => (settings.checklists && settings.checklists[key]) || getSetupDef(key).checklist || [];
 
 /* ---------------- Confirm dialog ---------------- */
@@ -1177,7 +1178,7 @@ function renderTable(){
   $("emptyTable").style.display = rows.length?"none":"block";
   $("tbody").innerHTML = rows.map(([id,t])=>`
     <tr data-id="${id}">
-      <td class="mono" style="font-size:12.5px">${esc(t.date||"")}</td>
+      <td class="mono" style="font-size:12.5px">${esc(fmtDate(t.date))}</td>
       <td class="mono">${esc(t.symbol)}${t.imgCount?` <span title="כולל צילומים">🖼</span>`:""}${t.stopManaged==="trailed"?` <span title="הסטופ הוזז/קודם">↗</span>`:""}</td>
       <td><span class="dirdot ${t.direction}">${t.direction==="long"?"▲":"▼"}</span></td>
       <td>${esc((getSetupDef(t.setup).label||t.setup).split(" —")[0])}</td>
@@ -1195,7 +1196,7 @@ function openDetail(id){
   currentDetailId=id; const t=trades[id]; if(!t) return;
   $("d_title").innerHTML = `<span class="mono">${esc(t.symbol)}</span> · ${esc((getSetupDef(t.setup).label||t.setup).split(" —")[0])} <span class="dirdot ${t.direction}">${t.direction==="long"?"▲":"▼"}</span>`;
   const rowsHtml=[
-    ["תאריך",t.date],["סביבה",t.mode==="live"?"לייב":"בקטסט"],
+    ["תאריך",fmtDate(t.date)],["סביבה",t.mode==="live"?"לייב":"בקטסט"],
     ["חשבון",ACC_LBL[t.account]],["סטטוס",STATUS_LBL[t.status]],
     ["מחיר כניסה",fmt(t.entry,6)],["מחיר סטופ",fmt(t.stop,6)],
     ["מחיר טרגט",t.target?fmt(t.target,6):"—"],["מחיר יציאה",t.exit?fmt(t.exit,6):"—"],
