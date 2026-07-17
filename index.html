@@ -104,6 +104,8 @@ nav.tabs button.on{background:var(--panel);color:var(--amber);border-color:var(-
 .dirseg button{flex:1;padding:9px;color:var(--muted);font-weight:600;transition:all .15s}
 .dirseg button.long.on{background:var(--long-dim);color:var(--long)}
 .dirseg button.short.on{background:var(--short-dim);color:var(--short)}
+#sizeSeg button.on{background:var(--amber-dim);color:var(--amber)}
+#sizeSeg button{font-size:13px;padding:9px 6px}
 
 #rrWrap{grid-column:1/-1;background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
 #rrTop{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:10px}
@@ -113,7 +115,8 @@ nav.tabs button.on{background:var(--panel);color:var(--amber);border-color:var(-
 #rrRisk{background:linear-gradient(90deg,#c94b6a,#f4657f);transition:width .25s}
 #rrReward{background:linear-gradient(90deg,#36d69b,#1f9e70);transition:width .25s}
 
-.calcRow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:13px}
+.calcRow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:13px}
+@media(max-width:1000px){.calcRow{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:820px){.calcRow{grid-template-columns:repeat(2,1fr)}}
 .calcbox{background:rgba(15,17,30,.55);border:1px dashed var(--border2);border-radius:10px;padding:9px 12px;user-select:none}
 .calcbox .cl{font-size:11.5px;color:var(--faint)}
@@ -332,13 +335,25 @@ tbody tr:hover{background:rgba(143,123,245,.06)}
           <input id="f_target" type="number" step="any" placeholder="השאר ריק אם פתוח">
           <div class="ferr" id="err_target"></div>
         </div>
-        <div>
+        <div class="c2">
+          <label>שיטת גודל פוזיציה</label>
+          <div class="dirseg" id="sizeSeg">
+            <button type="button" data-sm="pct" class="on">אחוז מהחשבון</button>
+            <button type="button" data-sm="capital">סכום מושקע</button>
+            <button type="button" data-sm="units">כמות יחידות</button>
+          </div>
+        </div>
+        <div id="sizeInputPct">
           <label>סיכון בעסקה (% מהחשבון)</label>
           <input id="f_riskpct" type="number" step="any" placeholder="אוטומטי מההגדרות">
         </div>
-        <div class="c2">
-          <label>סכום מושקע בפוזיציה <span style="color:var(--faint);font-weight:400">(אופציונלי — עוקף את חישוב האחוז)</span></label>
-          <input id="f_capital" type="number" step="any" placeholder="לדוגמה 500 — אם ידוע ישירות">
+        <div id="sizeInputCapital" class="c2" style="display:none">
+          <label>סכום מושקע בפוזיציה</label>
+          <input id="f_capital" type="number" step="any" placeholder="לדוגמה 500">
+        </div>
+        <div id="sizeInputUnits" class="c2" style="display:none">
+          <label>כמות יחידות (מניות / מטבעות)</label>
+          <input id="f_units" type="number" step="any" placeholder="לדוגמה 1350">
         </div>
 
         <div id="rrWrap">
@@ -356,6 +371,7 @@ tbody tr:hover{background:rgba(143,123,245,.06)}
             <div class="calcbox"><div class="cl">סיכון כספי</div><div class="cv" id="c_risk">—</div></div>
             <div class="calcbox"><div class="cl">גודל פוזיציה</div><div class="cv" id="c_size">—</div></div>
             <div class="calcbox"><div class="cl">עלות פוזיציה</div><div class="cv" id="c_cost">—</div></div>
+            <div class="calcbox"><div class="cl">אחוז סיכון מרומז מהחשבון</div><div class="cv" id="c_impliedRisk">—</div></div>
           </div>
           <div class="checks" id="checksRow"></div>
         </div>
@@ -897,6 +913,18 @@ function setDir(d){ direction=d;
 }
 $("dirLong").onclick=()=>{ setDir("long"); markDirty(); };
 $("dirShort").onclick=()=>{ setDir("short"); markDirty(); };
+
+/* ---------------- Sizing method (mutually exclusive) ---------------- */
+let sizingMethod="pct";
+function setSizingMethod(m){
+  sizingMethod=m;
+  document.querySelectorAll("#sizeSeg button").forEach(b=>b.classList.toggle("on", b.dataset.sm===m));
+  $("sizeInputPct").style.display = m==="pct" ? "block":"none";
+  $("sizeInputCapital").style.display = m==="capital" ? "block":"none";
+  $("sizeInputUnits").style.display = m==="units" ? "block":"none";
+  calc();
+}
+document.querySelectorAll("#sizeSeg button").forEach(b=>b.onclick=()=>{ setSizingMethod(b.dataset.sm); markDirty(); });
 $("f_stopManaged").addEventListener("change", ()=>{
   $("stopLogWrap").style.display = $("f_stopManaged").value==="trailed" ? "block":"none";
   markDirty();
@@ -932,11 +960,11 @@ $("f_symbol").addEventListener("change", ()=>{
 });
 
 function markDirty(){ formDirty=true; }
-["f_entry","f_stop","f_target","f_exit","f_notes","f_riskpct","f_capital"].forEach(id=>$(id).addEventListener("input", markDirty));
+["f_entry","f_stop","f_target","f_exit","f_notes","f_riskpct","f_capital","f_units"].forEach(id=>$(id).addEventListener("input", markDirty));
 ["f_account","f_symbol","f_phase","f_bias","f_tfC","f_tfT","f_align","f_status","f_grade"].forEach(id=>$(id).addEventListener("change", markDirty));
 $("f_symbolCustom").addEventListener("input", markDirty);
 
-["f_entry","f_stop","f_target","f_riskpct","f_exit","f_capital"].forEach(id=>$(id).addEventListener("input", calc));
+["f_entry","f_stop","f_target","f_riskpct","f_exit","f_capital","f_units"].forEach(id=>$(id).addEventListener("input", calc));
 $("f_account").addEventListener("change", calc);
 
 function chip(ok, textOk, textBad){
@@ -963,14 +991,20 @@ function calc(){
   const accSize = parseFloat(effAccountSize($("f_account").value));
   const riskPct = parseFloat($("f_riskpct").value);
   const manualCap = parseFloat($("f_capital").value);
+  const manualUnits = parseFloat($("f_units").value);
   let riskAmt=null, units=null, cost=null, sizedManually=false;
-  if(hasES && !isNaN(manualCap) && manualCap>0){
+  if(sizingMethod==="units" && hasES && !isNaN(manualUnits) && manualUnits>0){
+    units = manualUnits;
+    cost = units*e;
+    riskAmt = units*risk;
+    sizedManually=true;
+  } else if(sizingMethod==="capital" && hasES && !isNaN(manualCap) && manualCap>0){
     units = manualCap/e;
     if($("f_account").value==="stocks") units=Math.floor(units);
     cost = units*e;
     riskAmt = units*risk;
     sizedManually=true;
-  } else if(hasES && !isNaN(accSize) && !isNaN(riskPct) && riskPct>0){
+  } else if(sizingMethod==="pct" && hasES && !isNaN(accSize) && !isNaN(riskPct) && riskPct>0){
     riskAmt = accSize*riskPct/100;
     units = riskAmt/risk;
     if($("f_account").value==="stocks") units=Math.floor(units);
@@ -980,17 +1014,33 @@ function calc(){
   $("c_risk").textContent = riskAmt!==null?fmt(riskAmt):"—";
   $("c_size").textContent = units!==null?fmt(units, $("f_account").value==="stocks"?0:4):"—";
   $("c_cost").textContent = cost!==null?fmt(cost):"—";
+  // implied risk % sanity check — always computed when possible, regardless of sizing method
+  let impliedRiskPct=null;
+  if(riskAmt!==null && !isNaN(accSize) && accSize>0){
+    impliedRiskPct = (riskAmt/accSize)*100;
+  }
+  const impliedBox=$("c_impliedRisk");
+  if(impliedRiskPct!==null){
+    impliedBox.textContent = fmt(impliedRiskPct,2)+"%";
+    const baseRisk = !isNaN(riskPct)&&riskPct>0 ? riskPct : (parseFloat(settings.riskPct)||null);
+    impliedBox.style.color = (baseRisk && impliedRiskPct >= baseRisk*2) ? "var(--short)" : "var(--text)";
+  } else {
+    impliedBox.textContent = "—"; impliedBox.style.color="var(--text)";
+  }
   // validity chips
   let stopOk=null;
   if(hasES) stopOk = direction==="long" ? s<e : s>e;
   let targetOk=null;
   if(hasES && !isNaN(t)) targetOk = direction==="long" ? t>e : t<e;
+  const baseRiskForChip = !isNaN(riskPct)&&riskPct>0 ? riskPct : (parseFloat(settings.riskPct)||null);
+  const impliedOk = impliedRiskPct===null ? null : (baseRiskForChip ? impliedRiskPct < baseRiskForChip*2 : null);
   const chips=[
     chip(stopOk, "הסטופ בצד הנכון", hasES?"הסטופ בצד הלא נכון לכיוון העסקה":"סטופ — ממתין לנתונים"),
     chip(targetOk, "הטרגט בכיוון העסקה", (hasES&&!isNaN(t))?"הטרגט בצד הלא נכון":"ללא טרגט קבוע — ניהול בסטופ נגרר"),
     chip(rr===null?null:rr>=minrr, "R:R מעל הסף ("+minrr+")", rr===null?"R:R — ללא טרגט קבוע":"R:R מתחת לסף ("+minrr+")"),
-    chip(riskAmt!==null?true:(isNaN(accSize)?false:null), sizedManually?"גודל פוזיציה הוזן ידנית":"גודל חשבון מוגדר", riskAmt!==null?"":(isNaN(accSize)?(viewMode==="backtest"?"לא הוגדר הון בקטסט — אפשר גם להזין סכום ידני":"לא הוגדר חשבון לייב — אפשר גם להזין סכום ידני"):"חשבון — ממתין לאחוז סיכון")),
-    chip(cost===null?null:(isNaN(accSize)?null:cost<=accSize), "העלות בתוך גודל החשבון", cost===null?"עלות — ממתין לנתונים":(isNaN(accSize)?"עלות ידועה — אין גודל חשבון להשוואה":"העלות חורגת מגודל החשבון (מינוף?)"))
+    chip(riskAmt!==null?true:(isNaN(accSize)?false:null), sizedManually?"גודל פוזיציה הוזן ידנית":"גודל חשבון מוגדר", riskAmt!==null?"":(isNaN(accSize)?(viewMode==="backtest"?"לא הוגדר הון בקטסט — אפשר גם להזין סכום/יחידות ידנית":"לא הוגדר חשבון לייב — אפשר גם להזין סכום/יחידות ידנית"):"חשבון — ממתין לאחוז סיכון")),
+    chip(cost===null?null:(isNaN(accSize)?null:cost<=accSize), "העלות בתוך גודל החשבון", cost===null?"עלות — ממתין לנתונים":(isNaN(accSize)?"עלות ידועה — אין גודל חשבון להשוואה":"העלות חורגת מגודל החשבון (מינוף?)")),
+    chip(impliedOk, "הסיכון המרומז תואם את הסיכון הרגיל", impliedRiskPct===null?"סיכון מרומז — ממתין לנתונים":"הסיכון המרומז ("+fmt(impliedRiskPct,1)+"%) חורג משמעותית מהרגיל אצלך")
   ];
   $("checksRow").innerHTML=chips.join("");
   // live actual R, based on exit price if provided
@@ -1086,19 +1136,27 @@ $("saveBtn").onclick = async ()=>{
   const riskPct=parseFloat($("f_riskpct").value);
   const accSize = parseFloat(effAccountSize($("f_account").value));
   const manualCap = parseFloat($("f_capital").value);
-  let positionSize=null, pnlAmount=null;
-  if(!isNaN(manualCap) && manualCap>0){
+  const manualUnits = parseFloat($("f_units").value);
+  let positionSize=null, pnlAmount=null, riskAmtSaved=null;
+  if(sizingMethod==="units" && !isNaN(manualUnits) && manualUnits>0){
+    positionSize = manualUnits;
+    riskAmtSaved = manualUnits*risk;
+    if(!isNaN(x)) pnlAmount = direction==="long" ? (x-e)*manualUnits : (e-x)*manualUnits;
+  } else if(sizingMethod==="capital" && !isNaN(manualCap) && manualCap>0){
     let units = manualCap/e;
     if($("f_account").value==="stocks") units=Math.floor(units);
     positionSize = units;
+    riskAmtSaved = units*risk;
     if(!isNaN(x)) pnlAmount = direction==="long" ? (x-e)*units : (e-x)*units;
-  } else if(!isNaN(accSize) && !isNaN(riskPct) && riskPct>0){
+  } else if(sizingMethod==="pct" && !isNaN(accSize) && !isNaN(riskPct) && riskPct>0){
     const riskAmt = accSize*riskPct/100;
     let units = riskAmt/risk;
     if($("f_account").value==="stocks") units=Math.floor(units);
     positionSize = units;
+    riskAmtSaved = riskAmt;
     if(!isNaN(x)) pnlAmount = direction==="long" ? (x-e)*units : (e-x)*units;
   }
+  const impliedRiskPct = (riskAmtSaved!==null && !isNaN(accSize) && accSize>0) ? (riskAmtSaved/accSize)*100 : null;
   const trade={
     mode:viewMode, account:$("f_account").value, symbol:sym,
     date:$("f_date").value||new Date().toISOString().slice(0,10),
@@ -1106,8 +1164,11 @@ $("saveBtn").onclick = async ()=>{
     tfContext:$("f_tfC").value, tfTrigger:$("f_tfT").value, align:$("f_align").value,
     entry:e, stop:s, target:isNaN(t)?null:t, exit:isNaN(x)?null:x,
     riskPct:isNaN(riskPct)?null:riskPct,
-    positionCapital: (!isNaN(manualCap)&&manualCap>0) ? manualCap : null,
+    sizingMethod:sizingMethod,
+    positionCapital: (sizingMethod==="capital" && !isNaN(manualCap)&&manualCap>0) ? manualCap : null,
+    positionUnitsInput: (sizingMethod==="units" && !isNaN(manualUnits)&&manualUnits>0) ? manualUnits : null,
     positionSize: positionSize===null?null:+positionSize.toFixed(6),
+    impliedRiskPct: impliedRiskPct===null?null:+impliedRiskPct.toFixed(2),
     pnlAmount: pnlAmount===null?null:+pnlAmount.toFixed(2),
     plannedRR: rr===null?null:+rr.toFixed(2),
     actualR: actualR===null?null:+actualR.toFixed(2),
@@ -1133,11 +1194,12 @@ $("saveBtn").onclick = async ()=>{
 };
 function msg(t,c){ $("saveMsg").textContent=t; $("saveMsg").style.color=c; }
 function resetForm(clearMsg=true){
-  ["f_entry","f_stop","f_target","f_exit","f_notes","f_stopLog","f_capital"].forEach(id=>$(id).value="");
+  ["f_entry","f_stop","f_target","f_exit","f_notes","f_stopLog","f_capital","f_units"].forEach(id=>$(id).value="");
   $("f_status").value="open"; $("f_grade").value=""; $("f_phase").value=""; $("f_bias").value="";
   $("f_tfC").value=""; $("f_tfT").value=""; $("f_align").value="";
   $("f_stopManaged").value="none"; $("stopLogWrap").style.display="none";
   $("f_riskpct").value = settings.riskPct ?? "";
+  setSizingMethod("pct");
   $("f_date").valueAsDate=new Date();
   renderSymbolOptions();
   pendingImages=[]; renderThumbs(); renderChecklist();
@@ -1202,6 +1264,7 @@ function openDetail(id){
     ["מחיר טרגט",t.target?fmt(t.target,6):"—"],["מחיר יציאה",t.exit?fmt(t.exit,6):"—"],
     ["R:R מתוכנן",t.plannedRR?("1:"+fmt(t.plannedRR)):"—"],["R בפועל",t.actualR!=null?fmt(t.actualR)+"R":"—"],
     ["רווח/הפסד",t.pnlAmount!=null?fmt(t.pnlAmount)+" "+CUR_LBL[t.account]:"—"],["גודל פוזיציה",t.positionSize!=null?fmt(t.positionSize,4):"—"],
+    ["שיטת גודל פוזיציה",{pct:"אחוז מהחשבון",capital:"סכום מושקע",units:"כמות יחידות"}[t.sizingMethod]||"—"],["אחוז סיכון מרומז",t.impliedRiskPct!=null?fmt(t.impliedRiskPct,2)+"%":"—"],
     ["סיכון בעסקה",t.riskPct!=null?fmt(t.riskPct)+"%":"—"],["ציון ביצוע",t.grade||"—"],
     ["ניהול הסטופ",t.stopManaged==="trailed"?"הוזז / קודם":"לא הוזז"],
     ["פאזה",PHASE_LBL(t.phase)],["המבנה בטווח הגבוה",BIAS_LBL[t.bias||""]],
@@ -1255,6 +1318,10 @@ $("d_edit").onclick=async()=>{
   $("f_target").value=t.target??""; $("f_exit").value=t.exit??"";
   $("f_riskpct").value=t.riskPct??(settings.riskPct??"");
   $("f_capital").value=t.positionCapital??"";
+  $("f_units").value=t.positionUnitsInput??"";
+  // backward compatibility: older trades saved before sizingMethod existed only had positionCapital
+  const savedMethod = t.sizingMethod || (t.positionCapital!=null ? "capital" : "pct");
+  setSizingMethod(savedMethod);
   $("f_stopManaged").value=t.stopManaged||"none";
   $("stopLogWrap").style.display = t.stopManaged==="trailed" ? "block":"none";
   $("f_stopLog").value=t.stopLog||"";
